@@ -3,6 +3,7 @@
  */
 
 #include <stdio.h>
+#include <malloc.h>
 
 #include <psp2/ctrl.h>
 #include <psp2/touch.h>
@@ -21,33 +22,29 @@
 PSP2_MODULE_INFO(0, 0, "psp2helloworld")
 int main()
 {
-	CtrlData pad, old_pad;
+	SceCtrlData pad, old_pad;
 	//struct chip8_context chip8;
 	int i, pause = 0;
 
 	init_video();
 	char *system_rom
-    = (char*)malloc(sizeof(char) * (strlen(pspGetAppDirectory()) + 13));
-  sprintf(system_rom, "%slynxboot.img", pspGetAppDirectory());
+    = (char*)malloc(sizeof(char) * (strlen("pss0:/top/Documents/") + 13));
+  sprintf(system_rom, "%slynxboot.img", "pss0:/top/Documents/");
 
 	char *path
-		= (char*)malloc(sizeof(char) * (strlen("pss0:/top/Documents/"));
-	sprintf(path, "pss0:/top/Documents/";
+		= (char*)malloc(sizeof(char) * (strlen("pss0:/top/Documents/")));
+	sprintf(path, "pss0:/top/Documents/");
 
 
   CSystem *system;
 
-  try
-  {
+
+
     system = new CSystem(path, system_rom);
-  }
-  catch(CLynxException &err)
-  {
     free(system_rom);
 		free(path);
     //pspUiAlert(err.mMsg);
-    return 0;
-  }
+
 	//chip8_init(&chip8, 64, 32);
 	//chip8_loadrom_memory(&chip8, PONG2_bin, PONG2_bin_size);
 	//unsigned int disp_buf[chip8.disp_w*chip8.disp_h];
