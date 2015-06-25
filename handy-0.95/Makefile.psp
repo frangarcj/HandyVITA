@@ -1,0 +1,41 @@
+PSPSDK=$(shell psp-config --pspsdk-path)
+
+PSPAPP=./psp
+PSPLIB=$(PSPAPP)/psplib
+ZLIB=zlib-113
+DATA=$(PSPAPP)/data
+
+PSP_APP_NAME=Handy PSP
+PSP_APP_VER=0.95.1
+
+TARGET=handypsp
+EXTRA_TARGETS=EBOOT.PBP
+PSP_EBOOT_TITLE=$(PSP_APP_NAME) $(PSP_APP_VER)
+PSP_EBOOT_ICON=$(DATA)/handy-icon.png
+
+BUILD_PSPLIB=$(PSPLIB)/psp.o $(PSPLIB)/font.o $(PSPLIB)/image.o \
+             $(PSPLIB)/video.o $(PSPLIB)/audio.o $(PSPLIB)/fileio.o \
+             $(PSPLIB)/menu.o $(PSPLIB)/ui.o $(PSPLIB)/ctrl.o \
+             $(PSPLIB)/perf.o $(PSPLIB)/util.o $(PSPLIB)/init.o
+BUILD_ZLIB=$(ZLIB)/unzip.o
+BUILD_APP=Cart.o Susie.o Mikie.o Memmap.o Ram.o Rom.o System.o C65c02.o
+BUILD_PSPAPP=$(PSPAPP)/menu.o $(PSPAPP)/emulate.o \
+             $(PSPAPP)/main.o
+
+OBJS=$(BUILD_PSPLIB) $(BUILD_ZLIB) $(BUILD_APP) $(BUILD_PSPAPP)
+
+DEFINES=-DHANDY_AUDIO_BUFFER_SIZE=4096 -DGZIP_STATE
+BASE_DEFS=-DPSP -DPSP_APP_VER=\"$(PSP_APP_VER)\" -DPSP_APP_NAME="\"$(PSP_APP_NAME)\""
+CFLAGS=-O2 -G0 -Wall $(BASE_DEFS) $(DEFINES)
+CXXFLAGS=$(CFLAGS) -fno-rtti -Wno-deprecated
+ASFLAGS=$(CFLAGS)
+INCDIR=$(PSPLIB) 
+LIBS=-lpng -lm -lc -lz -lpspgu -lpsppower -lpspaudio -lpsprtc -lstdc++
+
+#PSP_FW_VERSION=360
+
+include $(PSPSDK)/lib/build.mak
+
+include $(PSPLIB)/build.mak
+
+
