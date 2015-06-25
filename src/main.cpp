@@ -19,7 +19,6 @@
 
 
 PSP2_MODULE_INFO(0, 0, "psp2helloworld")
-
 int main()
 {
 	CtrlData pad, old_pad;

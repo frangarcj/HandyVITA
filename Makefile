@@ -20,10 +20,10 @@ BUILD_APP=$(HANDY)/Cart.o $(HANDY)/Susie.o $(HANDY)/Mikie.o $(HANDY)/Memmap.o $(
 CFILES   := $(foreach dir,$(SOURCES), $(wildcard $(dir)/*.c))
 CXXFILES   := $(foreach dir,$(SOURCES), $(wildcard $(dir)/*.cpp))
 BINFILES := $(foreach dir,$(DATA), $(wildcard $(dir)/*.bin))
-OBJS     := $(addsuffix .o,$(BINFILES)) $(CFILES:.c=.o)  $(BUILD_APP)
+OBJS     := $(addsuffix .o,$(BINFILES)) $(CFILES:.c=.o) $(CXXFILES:.cpp=.o)  $(BUILD_APP)
 
 LIBS = -lc_stub -lstdc++_stub -lm_stub -lSceKernel_stub -lSceDisplay_stub -lSceGxm_stub 	\
-	-lSceCtrl_stub -lSceTouch_stub -lgcc
+	-lSceCtrl_stub -lSceTouch_stub
 
 DEFINES	=	-DPSP -DHANDY_AUDIO_BUFFER_SIZE=4096 -DGZIP_STATE
 
@@ -34,7 +34,7 @@ CC      = $(PREFIX)-gcc
 CXX			=$(PREFIX)-g++
 READELF = $(PREFIX)-readelf
 OBJDUMP = $(PREFIX)-objdump
-CFLAGS  = -Wall -nostartfiles -nostdlib -specs=$(PSP2SDK)/psp2.specs -Idata/ $(DEFINES)
+CFLAGS  = -Wall -specs=$(PSP2SDK)/psp2.specs -I$(DATA)  $(DEFINES)
 CXXFLAGS = $(CFLAGS) -fno-rtti -fno-exceptions -Wno-deprecated
 ASFLAGS = $(CFLAGS)
 
