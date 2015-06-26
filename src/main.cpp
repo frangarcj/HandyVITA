@@ -18,6 +18,13 @@
 
 #include "PONG2_bin.h"
 
+extern "C" void __cxa_pure_virtual()
+{
+	while (1);
+}
+
+extern "C" void *__dso_handle = NULL;
+
 
 PSP2_MODULE_INFO(0, 0, "psp2helloworld")
 int main()

@@ -22,7 +22,7 @@ CXXFILES   := $(foreach dir,$(SOURCES), $(wildcard $(dir)/*.cpp))
 BINFILES := $(foreach dir,$(DATA), $(wildcard $(dir)/*.bin))
 OBJS     := $(addsuffix .o,$(BINFILES)) $(CFILES:.c=.o) $(CXXFILES:.cpp=.o)  $(BUILD_APP)
 
-LIBS = -lc_stub -lstdc++_stub -lm_stub -lSceKernel_stub -lSceDisplay_stub -lSceGxm_stub 	\
+LIBS = -lc -lrdimon -lSceDisplay_stub -lSceGxm_stub 	\
 	-lSceCtrl_stub -lSceTouch_stub
 
 DEFINES	=	-DPSP -DHANDY_AUDIO_BUFFER_SIZE=4096 -DGZIP_STATE
@@ -35,7 +35,7 @@ CXX			=$(PREFIX)-g++
 READELF = $(PREFIX)-readelf
 OBJDUMP = $(PREFIX)-objdump
 CFLAGS  = -Wall -specs=$(PSP2SDK)/psp2.specs -I$(DATA)  $(DEFINES)
-CXXFLAGS = $(CFLAGS) -fno-rtti -fno-exceptions -Wno-deprecated -std=gnu++11
+CXXFLAGS = $(CFLAGS) -O2 -mword-relocations -fomit-frame-pointer -fno-unwind-tables -fno-rtti -fno-exceptions -Wno-deprecated -std=gnu++11
 ASFLAGS = $(CFLAGS)
 
 
