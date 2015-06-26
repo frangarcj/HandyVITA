@@ -35,7 +35,7 @@ CXX			=$(PREFIX)-g++
 READELF = $(PREFIX)-readelf
 OBJDUMP = $(PREFIX)-objdump
 CFLAGS  = -Wall -specs=$(PSP2SDK)/psp2.specs -I$(DATA)  $(DEFINES)
-CXXFLAGS = $(CFLAGS) -fno-rtti -fno-exceptions -Wno-deprecated
+CXXFLAGS = $(CFLAGS) -fno-rtti -fno-exceptions -Wno-deprecated -std=gnu++11
 ASFLAGS = $(CFLAGS)
 
 
@@ -46,7 +46,7 @@ $(TARGET).velf: $(TARGET).elf
 	psp2-fixup -q -S $< $@
 
 $(TARGET).elf: $(OBJS)
-	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+	$(CXX) $(CFLAGS) $^ $(LIBS) -o $@
 
 
 .SUFFIXES: .bin
