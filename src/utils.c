@@ -52,3 +52,15 @@ void blit_scale(unsigned int *buffer, int x, int y, int w, int h, int scale)
 		}
 	}
 }
+
+char *stpcpy(char *dest, const char *src)
+{
+	register char *d = dest;
+	register const char *s = src;
+
+	do {
+		*d++ = *s;
+	} while (*s++ != '\0');
+
+	return d - 1;
+}

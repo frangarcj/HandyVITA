@@ -4,28 +4,30 @@
 #
 
 TARGET		:= HANDY
-HANDY := handy-0.95
+HANDY := lynx
 ZLIB := $(HANDY)/zlib-113
-SOURCES		:= src $(ZLIB)
+#SOURCES		:= src $(ZLIB)
+SOURCES		:= src
+
 DATA		:= data
 INCLUDES	:= src
 
 
 #BUILD_ZLIB=$(ZLIB)/unzip.o
 
-BUILD_APP=$(HANDY)/Cart.o $(HANDY)/Susie.o $(HANDY)/Mikie.o $(HANDY)/Memmap.o $(HANDY)/Ram.o $(HANDY)/Rom.o $(HANDY)/System.o $(HANDY)/C65c02.o
+BUILD_APP=$(HANDY)/lynxdec.o $(HANDY)/Cart.o $(HANDY)/Memmap.o $(HANDY)/Mikie.o $(HANDY)/Ram.o $(HANDY)/Rom.o $(HANDY)/Susie.o $(HANDY)/System.o
 
 
 
 CFILES   := $(foreach dir,$(SOURCES), $(wildcard $(dir)/*.c))
 CXXFILES   := $(foreach dir,$(SOURCES), $(wildcard $(dir)/*.cpp))
 BINFILES := $(foreach dir,$(DATA), $(wildcard $(dir)/*.bin))
-OBJS     := $(addsuffix .o,$(BINFILES)) $(CFILES:.c=.o) $(CXXFILES:.cpp=.o)  $(BUILD_APP)
+OBJS     := $(addsuffix .o,$(BINFILES)) $(CFILES:.c=.o) $(BUILD_APP) $(CXXFILES:.cpp=.o)
 
-LIBS = -lc -lrdimon -lSceDisplay_stub -lSceGxm_stub 	\
+LIBS = -lc_stub -lstdc++_stub -lSceDisplay_stub -lSceGxm_stub 	\
 	-lSceCtrl_stub -lSceTouch_stub
 
-DEFINES	=	-DPSP -DHANDY_AUDIO_BUFFER_SIZE=4096 -DGZIP_STATE
+DEFINES	=	-DPSP -DHANDY_AUDIO_BUFFER_SIZE=4096 -DGZIP_STATE -DLSB_FIRST -DWANT_CRC32
 
 
 PREFIX  = arm-none-eabi
@@ -35,7 +37,7 @@ CXX			=$(PREFIX)-g++
 READELF = $(PREFIX)-readelf
 OBJDUMP = $(PREFIX)-objdump
 CFLAGS  = -Wall -specs=$(PSP2SDK)/psp2.specs -I$(DATA)  $(DEFINES)
-CXXFLAGS = $(CFLAGS) -O2 -mword-relocations -fomit-frame-pointer -fno-unwind-tables -fno-rtti -fno-exceptions -Wno-deprecated -std=gnu++11
+CXXFLAGS = $(CFLAGS) -O2 -mword-relocations -fomit-frame-pointer -fno-unwind-tables -fno-rtti -fno-exceptions -Wno-deprecated
 ASFLAGS = $(CFLAGS)
 
 
@@ -46,7 +48,7 @@ $(TARGET).velf: $(TARGET).elf
 	psp2-fixup -q -S $< $@
 
 $(TARGET).elf: $(OBJS)
-	$(CXX) $(CFLAGS) $^ $(LIBS) -o $@
+	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
 
 .SUFFIXES: .bin
