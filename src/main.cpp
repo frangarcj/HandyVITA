@@ -24,48 +24,85 @@
 }
 
 extern "C" void *__dso_handle = NULL;*/
+static uint8_t lynx_width = 160;
+static uint8_t lynx_height = 102;
+
+static unsigned int framebuffer[160*102*2];
+
+static int scale;
+static int pos_x;
+static int pos_y;
+
+static bool newFrame = false;
+static bool initialized = false;
 
 
-PSP2_MODULE_INFO(0, 0, "psp2helloworld")
+static CSystem *lynx = NULL;
+
+unsigned char* lynx_display_callback(ULONG objref)
+{
+    if(!initialized)
+    {
+        return (UBYTE*)framebuffer;
+    }
+
+		//PINTAR FRAMEBUFFER
+
+    //video_cb(framebuffer, lynx_width, lynx_height, 160*2);
+    blit_scale(framebuffer,pos_x,pos_y,lynx_width,lynx_height,scale);
+    /*if(gAudioBufferPointer > 0)
+    {
+        int f = gAudioBufferPointer;
+        lynx_sound_stream_update(soundBuffer, gAudioBufferPointer);
+        audio_batch_cb((const int16_t*)soundBuffer, f);
+    }*/
+
+    newFrame = true;
+    return (UBYTE*)framebuffer;
+}
+
+PSP2_MODULE_INFO(0, 0, "handyvita")
 int main()
 {
 	SceCtrlData pad, old_pad;
 	//struct chip8_context chip8;
-	int i, pause = 0;
+	int pause = 0;
 
 	init_video();
 	char *system_rom
-    = (char*)malloc(sizeof(char) * (strlen("pss0:/top/Documents/") + 13));
-  sprintf(system_rom, "%slynxboot.img", "pss0:/top/Documents/");
+    = (char*)malloc(sizeof(char) * (strlen("cache0:/Documents/") + 13));
+  sprintf(system_rom, "%slynxboot.img", "cache0:/top/Documents/");
 
 	char *path
-		= (char*)malloc(sizeof(char) * (strlen("pss0:/top/Documents/")));
-	sprintf(path, "pss0:/top/Documents/");
+		= (char*)malloc(sizeof(char) * (strlen("cache0:/Documents/rom.lnx")));
+	sprintf(path, "cache0:/Documents/rom.lnx");
 
+  printf("Loading lynx....");
 
-  CSystem *system;
+  lynx = new CSystem(path, system_rom);
 
+  printf("Lynx loaded: %p",lynx);
 
+  ULONG rot = MIKIE_NO_ROTATE;
+  lynx_width = 160;
+  lynx_height = 102;
 
-    system = new CSystem(path, system_rom);
-    free(system_rom);
-		free(path);
-    //pspUiAlert(err.mMsg);
+	lynx->DisplaySetAttributes(rot, MIKIE_PIXEL_FORMAT_16BPP_565, 320, lynx_display_callback, (ULONG)0);
 
 	//chip8_init(&chip8, 64, 32);
 	//chip8_loadrom_memory(&chip8, PONG2_bin, PONG2_bin_size);
-	//unsigned int disp_buf[chip8.disp_w*chip8.disp_h];
 
-	int scale = 12;
-	//int pos_x = SCREEN_W/2 - (chip8.disp_w/2)*scale;
-	//int pos_y = SCREEN_H/2 - (chip8.disp_h/2)*scale;
+	scale = 2;
+	pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
+	pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
+	initialized = true;
 
 	while (1) {
 		clear_screen();
 
 		sceCtrlPeekBufferPositive(0, (SceCtrlData *)&pad, 1);
 
-		font_draw_stringf(10, 10, BLACK, "HANDY emulator by xerpi");
+		font_draw_stringf(10, 10, BLACK, "HANDY emulator by frangarcj");
 
 		unsigned int keys_down = pad.buttons & ~old_pad.buttons;
 		unsigned int keys_up = ~pad.buttons & old_pad.buttons;
@@ -96,36 +133,29 @@ int main()
 			scale--;
 			if (scale < 1) scale = 1;
 			/* Re-center the image */
-			//pos_x = SCREEN_W/2 - (chip8.disp_w/2)*scale;
-			//pos_y = SCREEN_H/2 - (chip8.disp_h/2)*scale;
+			pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
+			pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
 		} else if (pad.buttons & PSP2_CTRL_RTRIGGER) {
 			scale++;
 			/* Don't go outside of the screen! */
-			//if ((chip8.disp_w*scale) > SCREEN_W) scale--;
+			if ((lynx_width*scale) > SCREEN_W) scale--;
 			/* Re-center the image */
-			//pos_x = SCREEN_W/2 - (chip8.disp_w/2)*scale;
-			//pos_y = SCREEN_H/2 - (chip8.disp_h/2)*scale;
+			pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
+			pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
 		}
 
 		if (keys_down & PSP2_CTRL_START) {
 			pause = !pause;
 		}
 
-		if (!pause) {
-			for (i = 0; i < 20; i++) {
-				//chip8_step(&chip8);
-			}
-		}
+		while(!newFrame)
+    {
+        lynx->Update();
+    }
 
-		//chip8_disp_to_buf(&chip8, disp_buf);
+    newFrame = false;
 
-		/*blit_scale(disp_buf,
-			pos_x,
-			pos_y,
-			chip8.disp_w,
-			chip8.disp_h,
-			scale);
-			*/
+
 		if (pause) {
 			font_draw_stringf(SCREEN_W/2 - 40, SCREEN_H - 50, BLACK, "PAUSE");
 		}

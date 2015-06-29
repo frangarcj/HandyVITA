@@ -24,7 +24,7 @@ CXXFILES   := $(foreach dir,$(SOURCES), $(wildcard $(dir)/*.cpp))
 BINFILES := $(foreach dir,$(DATA), $(wildcard $(dir)/*.bin))
 OBJS     := $(addsuffix .o,$(BINFILES)) $(CFILES:.c=.o) $(BUILD_APP) $(CXXFILES:.cpp=.o)
 
-LIBS = -lc_stub -lstdc++_stub -lSceDisplay_stub -lSceGxm_stub 	\
+LIBS = -lc_stub -lstdc++_stub -lSceKernel_stub -lSceDisplay_stub -lSceGxm_stub 	\
 	-lSceCtrl_stub -lSceTouch_stub
 
 DEFINES	=	-DPSP -DHANDY_AUDIO_BUFFER_SIZE=4096 -DGZIP_STATE -DLSB_FIRST -DWANT_CRC32

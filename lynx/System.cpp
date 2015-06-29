@@ -58,6 +58,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "system.h"
+#include <psp2/types.h>
+#include <psp2/io/fcntl.h>
+#include <psp2/io/dirent.h>
 //#include "error.h"
 //#include "zlib.h"
 
@@ -136,6 +139,9 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 	mSusie(NULL)
 {
 
+
+  printf("inside");
+
 #ifdef _LYNXDBG
 	mpDebugCallback=NULL;
 	mDebugCallbackObject=0;
@@ -157,27 +163,32 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 	else
 	{
 		// Open the file and load the file
-		FILE	*fp;
+		SceUID fp;
 
 		// Open the cartridge file for reading
-		if((fp=fopen(gamefile,"rb"))==NULL)
+		if((fp=sceIoOpen(gamefile,PSP2_O_RDONLY,0777))==NULL)
 		{
 			printf( "Invalid Cart.\n");
 		}
+		else
+		{
+			printf("fopen %s",fp);
+		}
 
 		// How big is the file ??
-		fseek(fp,0,SEEK_END);
-		filesize=ftell(fp);
-		fseek(fp,0,SEEK_SET);
+		filesize=sceIoLseek(fp,0,PSP2_SEEK_END);
+		sceIoLseek(fp,0,PSP2_SEEK_SET);
 		filememory=(UBYTE*) new UBYTE[filesize];
 
-		if(fread(filememory,sizeof(char),filesize,fp)!=filesize)
+		if(sceIoRead(fp,filememory,filesize)!=filesize)
 		{
 			printf( "Invalid Cart.\n");
 			delete filememory;
 		}
 
-		fclose(fp);
+		printf("LEIDOOOOO");
+
+		sceIoClose(fp);
 	}
 
 	// Now try and determine the filetype we have opened
