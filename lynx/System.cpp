@@ -172,7 +172,7 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 		}
 		else
 		{
-			printf("fopen %s",fp);
+			printf("fopen %d",fp);
 		}
 
 		// How big is the file ??
