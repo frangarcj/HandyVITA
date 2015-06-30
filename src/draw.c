@@ -203,4 +203,3 @@ void font_draw_stringf(int x, int y, uint32_t color, const char *s, ...)
 	va_end(argptr);
 	font_draw_string(x, y, color, buf);
 }
-

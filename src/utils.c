@@ -35,11 +35,11 @@ void chip8_disp_to_buf(struct chip8_context *ctx, unsigned int *buffer)
 	}
 }
 */
-void blit_scale(unsigned int *buffer, int x, int y, int w, int h, int scale)
+void blit_scale(uint32_t *buffer, int x, int y, int w, int h, int scale)
 {
 	int i, j;
 	int i2, j2;
-	unsigned int color;
+	uint32_t color;
 
 	for (i = 0; i < w; i++) {
 		for (j = 0; j < h; j++) {

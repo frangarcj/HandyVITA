@@ -13,6 +13,7 @@
 #include <psp2/moduleinfo.h>
 
 #include "../lynx/system.h"
+#include "../lynx/lynxdef.h"
 #include "utils.h"
 #include "draw.h"
 
@@ -27,13 +28,13 @@ extern "C" void *__dso_handle = NULL;*/
 static uint8_t lynx_width = 160;
 static uint8_t lynx_height = 102;
 
-static unsigned int framebuffer[160*102*2];
+static uint32_t framebuffer[160*102];
 
 static int scale;
 static int pos_x;
 static int pos_y;
 
-static bool newFrame = false;
+bool newFrame = false;
 static bool initialized = false;
 
 
@@ -41,6 +42,7 @@ static CSystem *lynx = NULL;
 
 unsigned char* lynx_display_callback(ULONG objref)
 {
+    printf("lynx_display_callback %d",initialized);
     if(!initialized)
     {
         return (UBYTE*)framebuffer;
@@ -50,6 +52,8 @@ unsigned char* lynx_display_callback(ULONG objref)
 
     //video_cb(framebuffer, lynx_width, lynx_height, 160*2);
     blit_scale(framebuffer,pos_x,pos_y,lynx_width,lynx_height,scale);
+    printf("blit_scale done");
+
     /*if(gAudioBufferPointer > 0)
     {
         int f = gAudioBufferPointer;
@@ -87,7 +91,7 @@ int main()
   lynx_width = 160;
   lynx_height = 102;
 
-	lynx->DisplaySetAttributes(rot, MIKIE_PIXEL_FORMAT_16BPP_565, 320, lynx_display_callback, (ULONG)0);
+	lynx->DisplaySetAttributes(rot, MIKIE_PIXEL_FORMAT_32BPP, 160*sizeof(uint32_t), lynx_display_callback, (ULONG)0);
 
 	//chip8_init(&chip8, 64, 32);
 	//chip8_loadrom_memory(&chip8, PONG2_bin, PONG2_bin_size);
@@ -147,12 +151,13 @@ int main()
 		if (keys_down & PSP2_CTRL_START) {
 			pause = !pause;
 		}
-
+    printf("starting frame");
 		while(!newFrame)
     {
         lynx->Update();
     }
 
+    printf("ending frame");
     newFrame = false;
 
 

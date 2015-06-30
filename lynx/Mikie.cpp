@@ -940,6 +940,7 @@ ULONG CMikie::DisplayRenderLine(void)
 		mTimerStatusFlags|=0x01;
 		gSystemIRQ=TRUE;	// Added 19/09/06 fix for IRQ issue
 	}
+	printf("Update() - DisplayRenderLine");
 
 // Logic says it should be 101 but testing on an actual lynx shows the rest
 // persiod is between lines 102,101,100 with the new line being latched at
@@ -1063,7 +1064,7 @@ ULONG CMikie::DisplayRenderLine(void)
 					}
 				}
 				else if(mDisplayFormat==MIKIE_PIXEL_FORMAT_32BPP)
-				{
+				{ printf("32bpp in");
 					for(loop=0;loop<SCREEN_WIDTH/2;loop++)
 					{
 						source=mpRamPointer[mLynxAddr];
@@ -1084,6 +1085,7 @@ ULONG CMikie::DisplayRenderLine(void)
 							bitmap_tmp+=sizeof(ULONG);
 						}
 					}
+					printf("32bpp out");
 				}
 				mpDisplayCurrent+=mDisplayPitch;
 				break;
@@ -1330,7 +1332,7 @@ ULONG CMikie::DisplayEndOfFrame(void)
 		gSystemIRQ=TRUE;	// Added 19/09/06 fix for IRQ issue
 	}
 
-//	TRACE_MIKIE0("Update() - Frame end");
+	printf("Update() - Frame end");
 	// Trigger the callback to the display sub-system to render the
 	// display and fetch the new pointer to be used for the lynx
 	// display buffer for the forthcoming frame

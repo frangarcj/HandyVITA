@@ -52,6 +52,9 @@
 #include <string.h>
 #include "system.h"
 #include "rom.h"
+#include <psp2/types.h>
+#include <psp2/io/fcntl.h>
+#include <psp2/io/dirent.h>
 
 extern CErrorInterface *gError;
 
@@ -67,24 +70,25 @@ CRom::CRom(const char *romfile)
 
 	// Load up the file
 
-	FILE	*fp;
+	SceUID	fp;
 
-	if((fp=fopen(mFileName,"rb"))==NULL)
+	if((fp=sceIoOpen(mFileName,PSP2_O_RDONLY,0777))==NULL)
 	{
 		printf( "Invalid ROM.\n");
 		return;
+	}else{
+		printf( "ROM valid : %d",fp);
 	}
 
 	// Read in the 512 bytes
-
-	if(fread(mRomData,sizeof(char),ROM_SIZE,fp)!=ROM_SIZE)
+	if(sceIoRead(fp,mRomData,ROM_SIZE)!=ROM_SIZE)
 	{
 		printf( "Invalid ROM.\n");
-		fclose(fp);
+		sceIoClose(fp);
 		return;
 	}
 
-	fclose(fp);
+	sceIoClose(fp);
 
 	// Check the code that has been loaded and report an error if its a
 	// fake version of the bootrom

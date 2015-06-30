@@ -166,7 +166,7 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 		SceUID fp;
 
 		// Open the cartridge file for reading
-		if((fp=sceIoOpen(gamefile,PSP2_O_RDONLY,0777))==NULL)
+		if((fp=sceIoOpen(gamefile,PSP2_O_RDONLY,0777))<=0)
 		{
 			printf( "Invalid Cart.\n");
 		}
@@ -186,7 +186,7 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 			delete filememory;
 		}
 
-		printf("LEIDOOOOO");
+		printf("FILESIZE %d",filesize);
 
 		sceIoClose(fp);
 	}
@@ -218,11 +218,14 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 	mRom = new CRom(romfile);
 
 	// An exception from this will be caught by the level above
-
+	printf("mFileType %d",mFileType);
+  printf("Creating cart");
 	switch(mFileType)
 	{
 		case HANDY_FILETYPE_LNX:
 			mCart = new CCart(filememory,filesize);
+			printf("Cart loaded");
+			printf("mCart->CartHeaderLess %d",mCart->CartHeaderLess());
 			if(mCart->CartHeaderLess())
 			{
 				FILE	*fp;
@@ -260,7 +263,9 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 			}
 			else
 			{
+				printf("Loading RAM...");
 				mRam = new CRam(0,0);
+				printf("RAM loaded");
 			}
 			break;
 		case HANDY_FILETYPE_HOMEBREW:
@@ -276,21 +281,22 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 	}
 
 	// These can generate exceptions
-
+  printf("Loading Mikie");
 	mMikie = new CMikie(*this);
+	printf("Loading Susie");
 	mSusie = new CSusie(*this);
 
 // Instantiate the memory map handler
-
+  printf("Loading MemMap");
 	mMemMap = new CMemMap(*this);
 
 // Now the handlers are set we can instantiate the CPU as is will use handlers on reset
-
+  printf("Loading CPU");
 	mCpu = new C65C02(*this);
 
 // Now init is complete do a reset, this will cause many things to be reset twice
 // but what the hell, who cares, I don't.....
-
+  printf("Reset");
 	Reset();
 
 // If this is a snapshot type then restore the context
@@ -305,6 +311,8 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 	}
 	if(filesize) delete filememory;
 	if(howardsize) delete howardmemory;
+
+	printf("end of constructor");
 }
 
 CSystem::~CSystem()

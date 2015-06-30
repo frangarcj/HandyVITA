@@ -198,19 +198,21 @@ class CSystem : public CSystemBase
 
 		inline void Update(void)
 		{
-//		    printf( "sys update\n");
+		  printf( "sys update %d,%d",gSystemCycleCount,gNextTimerEvent);
 			//
 			// Only update if there is a predicted timer event
 			//
 			if(gSystemCycleCount>=gNextTimerEvent)
 			{
+				printf("Start Mikie - update");
 				mMikie->Update();
+				printf("Stop Mikie - update");
 			}
 			//
 			// Step the processor through 1 instruction
 			//
 			mCpu->Update();
-//			printf( "end cpu update\n");
+			//printf( "end cpu update");
 
 #ifdef _LYNXDBG
 			// Check breakpoint
@@ -230,7 +232,7 @@ class CSystem : public CSystemBase
 				gSystemCycleCount=gNextTimerEvent;
 			}
 
-//			printf( "end sys update\n");
+			//printf( "end sys update");
 		}
 
 		//
