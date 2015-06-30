@@ -70,14 +70,14 @@ int main()
 
 	init_video();
 	char *system_rom
-    = (char*)malloc(sizeof(char) * (strlen("cache0:/Documents/") + 13));
-  sprintf(system_rom, "%slynxboot.img", "cache0:/top/Documents/");
+    = (char*)malloc(sizeof(char) * (strlen("cache0:/VitaDefilerClient/Documents/") + 13));
+  sprintf(system_rom, "%slynxboot.img", "cache0:/VitaDefilerClient/Documents/");
 
 	char *path
-		= (char*)malloc(sizeof(char) * (strlen("cache0:/Documents/rom.lnx")));
-	sprintf(path, "cache0:/Documents/rom.lnx");
+		= (char*)malloc(sizeof(char) * (strlen("cache0:/VitaDefilerClient/Documents/rom.lnx")));
+	sprintf(path, "cache0:/VitaDefilerClient/Documents/rom.lnx");
 
-  printf("Loading lynx....");
+  printf("Loading lynx.... %s",path);
 
   lynx = new CSystem(path, system_rom);
 
