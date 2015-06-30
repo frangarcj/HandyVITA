@@ -72,7 +72,7 @@ CRom::CRom(const char *romfile)
 
 	SceUID	fp;
 
-	if((fp=sceIoOpen(mFileName,PSP2_O_RDONLY,0777))==NULL)
+	if((fp=sceIoOpen(mFileName,PSP2_O_RDONLY,0777))<=0)
 	{
 		printf( "Invalid ROM.\n");
 		return;

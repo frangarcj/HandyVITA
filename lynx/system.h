@@ -198,7 +198,7 @@ class CSystem : public CSystemBase
 
 		inline void Update(void)
 		{
-		  printf( "sys update %d,%d",gSystemCycleCount,gNextTimerEvent);
+		  printf( "sys update %lu,%lu",gSystemCycleCount,gNextTimerEvent);
 			//
 			// Only update if there is a predicted timer event
 			//

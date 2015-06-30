@@ -17,8 +17,6 @@
 #include "utils.h"
 #include "draw.h"
 
-#include "PONG2_bin.h"
-
 /*extern "C" void __cxa_pure_virtual()
 {
 	while (1);

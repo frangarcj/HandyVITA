@@ -150,6 +150,7 @@ CCart::CCart(UBYTE *gamedata,ULONG gamesize)
 			mCountMask0=0x7ff;
 			break;
 		default:
+		  banktype0=UNUSED;
 			printf("Invalid cart.\n");
 			break;
 	}
@@ -188,6 +189,7 @@ CCart::CCart(UBYTE *gamedata,ULONG gamesize)
 			mCountMask1=0x7ff;
 			break;
 		default:
+		  banktype1=UNUSED;
 			printf("Invalid cart.\n");
 			break;
 	}
