@@ -240,7 +240,7 @@ int decrypt_frame(unsigned char * result,
                   const unsigned char * public_mod,
                   const int length)
 {
-    int i, j;
+    int i;
     int blocks;
     int accumulator;
     unsigned char* rptr = result;
@@ -279,11 +279,10 @@ void lynx_decrypt(unsigned char * result,
                   const unsigned char * encrypted,
                   const int length)
 {
-    int blocks = 0;
     int read_index = 0;
 
     /* decrypt the first frame of encrypted data */
-    blocks = decrypt_frame(&result[0],
+    decrypt_frame(&result[0],
                            &encrypted[read_index],
                            /* lynx_public_exp */ 0,
                            lynx_public_mod,

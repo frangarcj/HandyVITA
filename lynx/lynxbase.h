@@ -27,6 +27,7 @@
 #ifndef LYNXBASE_H
 #define LYNXBASE_H
 
+#include <stdio.h>
 //
 // bank0	- Cartridge bank 0
 // bank1	- Cartridge bank 1
