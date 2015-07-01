@@ -63,7 +63,7 @@ class CRam : public CLynxBase
 	// Function members
 
 	public:
-		CRam(UBYTE *filememory,ULONG filesize);
+    CRam(UBYTE *filememory,ULONG filesize,CSystem& parent);
 		~CRam();
 
 	public:
@@ -82,6 +82,8 @@ class CRam : public CLynxBase
 	// Data members
 
 	private:
+    CSystem		&mSystem;
+
 		UBYTE	mRamData[RAM_SIZE];
 		UBYTE	*mFileData;
 		ULONG	mFileSize;

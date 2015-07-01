@@ -54,13 +54,14 @@
 #include "system.h"
 #include "ram.h"
 
-CRam::CRam(UBYTE *filememory,ULONG filesize)
+CRam::CRam(UBYTE *filememory,ULONG filesize,CSystem& parent)
+	:mSystem(parent)
 {
 	HOME_HEADER	header;
 
 	// Take a copy into the backup buffer for restore on reset
 	mFileSize=filesize;
-  printf("RAM:%d",filesize);
+  printf("RAM:%lu",filesize);
 	if(filesize)
 	{
 		// Take a copy of the ram data
@@ -96,7 +97,7 @@ CRam::~CRam()
 void CRam::Reset(void)
 {
 	// Open up the file
-  printf("mFileSize%d,%d",mFileSize,sizeof(HOME_HEADER));
+  printf("mFileSize%lu,%d",mFileSize,sizeof(HOME_HEADER));
 	if(mFileSize >= sizeof(HOME_HEADER))
 	{
 		printf("if");
@@ -118,7 +119,7 @@ void CRam::Reset(void)
 		memset(mRamData, 0x00, header.load_address);
 		memcpy(mRamData+header.load_address, mFileData, data_size);
 		memset(mRamData+header.load_address+data_size, 0x00, RAM_SIZE-header.load_address-data_size);
-		gCPUBootAddress=header.load_address;
+		mSystem.gCPUBootAddress=header.load_address;
 	} else {
 		printf("else");
 		memset(mRamData, DEFAULT_RAM_CONTENTS, RAM_SIZE);

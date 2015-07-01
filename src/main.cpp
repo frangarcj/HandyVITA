@@ -3,6 +3,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <malloc.h>
 
 #include <psp2/ctrl.h>

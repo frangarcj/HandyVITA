@@ -46,19 +46,6 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#pragma inline_depth (255)
-#pragma inline_recursion (on)
-
-#ifdef _LYNXDBG
-
-//#ifdef _DEBUG
-//#define new DEBUG_NEW
-//#undef THIS_FILE
-//static char THIS_FILE[] = __FILE__;
-//#endif
-
-#endif
-
 #include "machine.h"
 
 #define HANDY_SYSTEM_FREQ						16000000
@@ -85,6 +72,7 @@
 // Define the global variable list
 //
 
+/*
 #ifdef SYSTEM_CPP
 	ULONG	gSystemCycleCount=0;
 	ULONG	gNextTimerEvent=0;
@@ -139,6 +127,7 @@
 
 	extern CErrorInterface *gError;
 #endif
+*/
 
 typedef struct lssfile
 {
@@ -324,6 +313,32 @@ class CSystem : public CSystemBase
 		CSusie			*mSusie;
 
 		ULONG			mFileType;
+
+		ULONG	gSystemCycleCount=0;
+		ULONG	gNextTimerEvent=0;
+		ULONG	gCPUWakeupTime=0;
+		ULONG	gIRQEntryCycle=0;
+		ULONG	gCPUBootAddress=0;
+		ULONG	gBreakpointHit=FALSE;
+		ULONG	gSingleStepMode=FALSE;
+		ULONG	gSingleStepModeSprites=FALSE;
+		ULONG	gSystemIRQ=FALSE;
+		ULONG	gSystemNMI=FALSE;
+		ULONG	gSystemCPUSleep=FALSE;
+		ULONG	gSystemCPUSleep_Saved=FALSE;
+		ULONG	gSystemHalt=FALSE;
+		ULONG	gThrottleMaxPercentage=100;
+		ULONG	gThrottleLastTimerCount=0;
+		ULONG	gThrottleNextCycleCheckpoint=0;
+
+		volatile ULONG gTimerCount=0;
+
+		ULONG	gAudioEnabled=FALSE;
+		UBYTE	gAudioBuffer[HANDY_AUDIO_BUFFER_SIZE];
+		ULONG	gAudioBufferPointer=0;
+		ULONG	gAudioLastUpdateCycle=0;
+
+		//CErrorInterface *gError=NULL;
 };
 
 

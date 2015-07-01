@@ -14,7 +14,7 @@ INCLUDES	:= src
 
 #BUILD_ZLIB=$(ZLIB)/unzip.o
 
-BUILD_APP=$(HANDY)/lynxdec.o $(HANDY)/Cart.o $(HANDY)/Memmap.o $(HANDY)/Mikie.o $(HANDY)/Ram.o $(HANDY)/Rom.o $(HANDY)/Susie.o $(HANDY)/System.o
+BUILD_APP=$(HANDY)/c65c02.o $(HANDY)/lynxdec.o $(HANDY)/Cart.o $(HANDY)/Memmap.o $(HANDY)/Mikie.o $(HANDY)/Ram.o $(HANDY)/Rom.o $(HANDY)/Susie.o $(HANDY)/System.o
 
 
 
@@ -28,6 +28,7 @@ LIBS = -lc_stub -lstdc++_stub -lSceKernel_stub -lSceDisplay_stub -lSceGxm_stub 	
 DEFINES	=	-DPSP -DLSB_FIRST -DWANT_CRC32
 
 
+
 PREFIX  = arm-none-eabi
 AS	= $(PREFIX)-as
 CC      = $(PREFIX)-gcc
@@ -35,7 +36,7 @@ CXX			=$(PREFIX)-g++
 READELF = $(PREFIX)-readelf
 OBJDUMP = $(PREFIX)-objdump
 CFLAGS  = -Wall -specs=psp2.specs -I$(DATA)  $(DEFINES)
-CXXFLAGS = $(CFLAGS) -O2 -mword-relocations -fomit-frame-pointer -fno-unwind-tables -fno-rtti -fno-exceptions -Wno-deprecated -Wno-comment
+CXXFLAGS = $(CFLAGS) -O2 -mword-relocations -fomit-frame-pointer -fno-unwind-tables -fno-rtti -fno-exceptions -Wno-deprecated -Wno-comment -Wno-sequence-point -std=c++11
 ASFLAGS = $(CFLAGS)
 
 
@@ -47,7 +48,6 @@ $(TARGET).velf: $(TARGET).elf
 
 $(TARGET).elf: $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
-
 
 clean:
 	@rm -rf $(TARGET).elf $(TARGET).velf $(OBJS) $(DATA)/*.h

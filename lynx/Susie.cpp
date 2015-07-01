@@ -891,7 +891,8 @@ ULONG CSusie::PaintSprites(void)
 										if(hoff>=0 && hoff<SCREEN_WIDTH)
 										{
 											ProcessPixel(hoff,pixel);
-											onscreen=everonscreen=TRUE;
+											onscreen=TRUE;
+											everonscreen=TRUE;
 										}
 										else
 										{
@@ -986,11 +987,11 @@ ULONG CSusie::PaintSprites(void)
 			}
 
 			// Perform Sprite debugging if required, single step on sprite draw
-			if(gSingleStepModeSprites)
+			if(mSystem.gSingleStepModeSprites)
 			{
 				char message[256];
 				sprintf(message,"CSusie:PaintSprites() - Rendered Sprite %03d",sprcount);
-				if(!gError->Warning(message)) gSingleStepModeSprites=0;
+				//if(!mSystem.gError->Warning(message)) mSystem.gSingleStepModeSprites=0;
 			}
 		}
 		else
@@ -1014,9 +1015,9 @@ ULONG CSusie::PaintSprites(void)
 		if(sprcount>4096)
 		{
 			// Stop the system, otherwise we may just come straight back in.....
-			gSystemHalt=TRUE;
+			mSystem.gSystemHalt=TRUE;
 			// Display warning message
-			gError->Warning("CSusie:PaintSprites(): Single draw sprite limit exceeded (>4096). The SCB is most likely looped back on itself. Reset/Exit is recommended");
+			//mSystem.gError->Warning("CSusie:PaintSprites(): Single draw sprite limit exceeded (>4096). The SCB is most likely looped back on itself. Reset/Exit is recommended");
 			// Signal error to the caller
 			return 0;
 		}
@@ -1374,7 +1375,7 @@ inline ULONG CSusie::LineInit(ULONG voff)
 
 	if(voff>101)
 	{
-		gError->Warning("CSusie::LineInit() Out of bounds (voff)");
+		//mSystem.gError->Warning("CSusie::LineInit() Out of bounds (voff)");
 		voff=0;
 	}
 
@@ -2241,9 +2242,9 @@ UBYTE CSusie::Peek(ULONG addr)
 		case (SPRSYS&0xff):
 			retval=0x0000;
 			//	retval+=(mSPRSYS_Status)?0x0001:0x0000;
-			// Use gSystemCPUSleep to signal the status instead, if we are asleep then
+			// Use mSystem.gSystemCPUSleep to signal the status instead, if we are asleep then
 			// we must be rendering sprites
-			retval+=(gSystemCPUSleep)?0x0001:0x0000;
+			retval+=(mSystem.gSystemCPUSleep)?0x0001:0x0000;
 			retval+=(mSPRSYS_StopOnCurrent)?0x0002:0x0000;
 			retval+=(mSPRSYS_UnsafeAccess)?0x0004:0x0000;
 			retval+=(mSPRSYS_LeftHand)?0x0008:0x0000;
@@ -2320,4 +2321,3 @@ UBYTE CSusie::Peek(ULONG addr)
 
 	return 0xff;
 }
-

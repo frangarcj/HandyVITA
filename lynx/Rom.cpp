@@ -56,8 +56,6 @@
 #include <psp2/io/fcntl.h>
 #include <psp2/io/dirent.h>
 
-extern CErrorInterface *gError;
-
 CRom::CRom(const char *romfile)
 {
 	mWriteEnable = FALSE;
@@ -105,9 +103,9 @@ CRom::CRom(const char *romfile)
 		{
 			if(mRomCheck[loop]!=mRomData[loop])
 			{
-				gError->Warning("FAKE LYNXBOOT.IMG - CARTRIDGES WILL NOT WORK\n\n"
+				/*mSystem.gError->Warning("FAKE LYNXBOOT.IMG - CARTRIDGES WILL NOT WORK\n\n"
 								"PLEASE READ THE ACCOMPANYING README.TXT FILE\n\n"
-								"(Do not email the author asking for this image)\n");
+								"(Do not email the author asking for this image)\n");*/
 				return;
 			}
 		}
