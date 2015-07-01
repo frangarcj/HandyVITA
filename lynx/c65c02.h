@@ -48,6 +48,8 @@
 //#include <crtdbg.h>
 //#define	TRACE_CPU
 
+#include <string.h>
+
 #ifdef TRACE_CPU
 
 #define TRACE_CPU0(msg)					_RPT1(_CRT_WARN,"C65C02::"msg" (Time=%012d)\n",gSystemCycleCount)
@@ -196,7 +198,12 @@ class C65C02
 	//
 	// Opcode prototypes
 	//
-
+			inline void xILLEGAL(void)
+			{
+				char addr[1024];
+				sprintf(addr,"C65C02::Update() - Illegal opcode (%02x) at PC=$%04x.",mOpcode,mPC);
+	            fprintf(stderr, "C65C02::Update() - Illegal opcode (%02x) at PC=$%04x.",mOpcode,mPC);
+			}
 	private:
 
 		// Answers value of the Processor Status register

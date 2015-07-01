@@ -130,13 +130,6 @@ int lss_read(void* dest,int varsize, int varcount,LSS_FILE *fp)
 }
 
 CSystem::CSystem(const char* gamefile, const char* romfile)
-	:mCart(NULL),
-	mRom(NULL),
-	mMemMap(NULL),
-	mRam(NULL),
-	mCpu(NULL),
-	mMikie(NULL),
-	mSusie(NULL)
 {
 
 
@@ -150,7 +143,7 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 	// Select the default filetype
 	UBYTE *filememory=NULL;
 	UBYTE *howardmemory=NULL;
-	ULONG filesize=0;
+	int filesize=0;
 	ULONG howardsize=0;
 
 	mFileType=HANDY_FILETYPE_LNX;
@@ -218,7 +211,7 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 	mRom = new CRom(romfile);
 
 	// An exception from this will be caught by the level above
-	printf("mFileType %d",mFileType);
+	printf("mFileType %lu",mFileType);
   printf("Creating cart");
 	switch(mFileType)
 	{
@@ -259,24 +252,24 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 				fclose(fp);
 
 				// Pass it to RAM to load
-				mRam = new CRam(howardmemory,howardsize);
+				mRam = new CRam(howardmemory,howardsize,*this);
 			}
 			else
 			{
 				printf("Loading RAM...");
-				mRam = new CRam(0,0);
+				mRam = new CRam(0,0,*this);
 				printf("RAM loaded");
 			}
 			break;
 		case HANDY_FILETYPE_HOMEBREW:
 			mCart = new CCart(0,0);
-			mRam = new CRam(filememory,filesize);
+			mRam = new CRam(filememory,filesize,*this);
 			break;
 		case HANDY_FILETYPE_SNAPSHOT:
 		case HANDY_FILETYPE_ILLEGAL:
 		default:
 			mCart = new CCart(0,0);
-			mRam = new CRam(0,0);
+			mRam = new CRam(0,0,*this);
 			break;
 	}
 
@@ -755,7 +748,8 @@ bool CSystem::ContextLoad(const char *context)
 	}
 	else
 	{
-		gError->Warning("Not a recognised LSS file");
+		printf("Not a recognised LSS file");
+		//gError->Warning("Not a recognised LSS file");
 	}
 
 	delete fp;

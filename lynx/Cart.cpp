@@ -52,14 +52,12 @@
 #include <string.h>
 #include "system.h"
 #include "cart.h"
-//#include "zlib.h"
 #include "scrc32.h"
 
 CCart::CCart(UBYTE *gamedata,ULONG gamesize)
 {
 
-	TRACE_CART1("CCart() called with %s",gamefile);
-	LYNX_HEADER	header;
+  LYNX_HEADER	header;
 
 	mWriteEnableBank0=FALSE;
 	mWriteEnableBank1=FALSE;
@@ -153,7 +151,6 @@ CCart::CCart(UBYTE *gamedata,ULONG gamesize)
 			printf("Invalid cart.\n");
 			break;
 	}
-	TRACE_CART1("CCart() - Bank0 = $%06x",mMaskBank0);
 
 	switch(header.page_size_bank1)
 	{
@@ -191,7 +188,6 @@ CCart::CCart(UBYTE *gamedata,ULONG gamesize)
 			printf("Invalid cart.\n");
 			break;
 	}
-	TRACE_CART1("CCart() - Bank1 = $%06x",mMaskBank1);
 
 	// Make some space for the new carts
 
@@ -229,7 +225,7 @@ CCart::CCart(UBYTE *gamedata,ULONG gamesize)
 	{
 		// As this is a cartridge boot unset the boot address
 
-		gCPUBootAddress=0;
+		//mSystem.gCPUBootAddress=0; //frangarcj
 
 		//
 		// Check if this is a headerless cart
@@ -239,7 +235,6 @@ CCart::CCart(UBYTE *gamedata,ULONG gamesize)
 		{
 			if(mCartBank0[loop&mMaskBank0]!=0x00) mHeaderLess=FALSE;
 		}
-		TRACE_CART1("CCart() - mHeaderLess=%d",mHeaderLess);
 	}
 
 	// Dont allow an empty Bank1 - Use it for shadow SRAM/EEPROM
@@ -248,7 +243,6 @@ CCart::CCart(UBYTE *gamedata,ULONG gamesize)
 		// Delete the single byte allocated  earlier
 		delete[] mCartBank1;
 		// Allocate some new memory for us
-		TRACE_CART0("CCart() - Bank1 being converted to 64K SRAM");
 		banktype1=C64K;
 		mMaskBank1=0x00ffff;
 		mShiftCount1=8;
@@ -262,7 +256,6 @@ CCart::CCart(UBYTE *gamedata,ULONG gamesize)
 
 CCart::~CCart()
 {
-	TRACE_CART0("~CCart()");
 	delete[] mCartBank0;
 	delete[] mCartBank1;
 }
@@ -270,97 +263,10 @@ CCart::~CCart()
 
 void CCart::Reset(void)
 {
-	TRACE_CART0("Reset()");
 	mCounter=0;
 	mShifter=0;
 	mAddrData=0;
 	mStrobe=0;
-}
-
-bool CCart::ContextSave(FILE *fp)
-{
-	TRACE_CART0("ContextSave()");
-	if(!fprintf(fp,"CCart::ContextSave")) return 0;
-	if(!fwrite(&mCounter,sizeof(ULONG),1,fp)) return 0;
-	if(!fwrite(&mShifter,sizeof(ULONG),1,fp)) return 0;
-	if(!fwrite(&mAddrData,sizeof(ULONG),1,fp)) return 0;
-	if(!fwrite(&mStrobe,sizeof(ULONG),1,fp)) return 0;
-	if(!fwrite(&mShiftCount0,sizeof(ULONG),1,fp)) return 0;
-	if(!fwrite(&mCountMask0,sizeof(ULONG),1,fp)) return 0;
-	if(!fwrite(&mShiftCount1,sizeof(ULONG),1,fp)) return 0;
-	if(!fwrite(&mCountMask1,sizeof(ULONG),1,fp)) return 0;
-	if(!fwrite(&mBank,sizeof(EMMODE),1,fp)) return 0;
-	if(!fwrite(&mWriteEnableBank0,sizeof(ULONG),1,fp)) return 0;
-	if(!fwrite(&mWriteEnableBank1,sizeof(ULONG),1,fp)) return 0;
-
-	if(!fwrite(&mCartRAM,sizeof(ULONG),1,fp)) return 0;
-	if(mCartRAM)
-	{
-		if(!fwrite(&mMaskBank1,sizeof(ULONG),1,fp)) return 0;
-		if(!fwrite(mCartBank1,sizeof(UBYTE),mMaskBank1+1,fp)) return 0;
-	}
-	return 1;
-}
-
-bool CCart::ContextLoad(LSS_FILE *fp)
-{
-	TRACE_CART0("ContextLoad()");
-	char teststr[100]="XXXXXXXXXXXXXXXXXX";
-	if(!lss_read(teststr,sizeof(char),18,fp)) return 0;
-	if(strcmp(teststr,"CCart::ContextSave")!=0) return 0;
-	if(!lss_read(&mCounter,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mShifter,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mAddrData,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mStrobe,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mShiftCount0,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mCountMask0,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mShiftCount1,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mCountMask1,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mBank,sizeof(EMMODE),1,fp)) return 0;
-	if(!lss_read(&mWriteEnableBank0,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mWriteEnableBank1,sizeof(ULONG),1,fp)) return 0;
-
-	if(!lss_read(&mCartRAM,sizeof(ULONG),1,fp)) return 0;
-	if(mCartRAM)
-	{
-		if(!lss_read(&mMaskBank1,sizeof(ULONG),1,fp)) return 0;
-		delete[] mCartBank1;
-		mCartBank1 = new UBYTE[mMaskBank1+1];
-		if(!lss_read(mCartBank1,sizeof(UBYTE),mMaskBank1+1,fp)) return 0;
-	}
-	return 1;
-}
-
-bool CCart::ContextLoadLegacy(LSS_FILE *fp)
-{
-	TRACE_CART0("ContextLoadLegacy()");
-	strcpy(mName,"<** IMAGE **>");
-	strcpy(mManufacturer,"<** RESTORED **>");
-	char teststr[100]="XXXXXXXXXXXXXXXXXX";
-	if(!lss_read(teststr,sizeof(char),18,fp)) return 0;
-	if(strcmp(teststr,"CCart::ContextSave")!=0) return 0;
-	if(!lss_read(&mRotation,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mHeaderLess,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mCounter,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mShifter,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mAddrData,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mStrobe,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mShiftCount0,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mCountMask0,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mShiftCount1,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mCountMask1,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mBank,sizeof(EMMODE),1,fp)) return 0;
-
-	if(!lss_read(&mMaskBank0,sizeof(ULONG),1,fp)) return 0;
-	if(!lss_read(&mMaskBank1,sizeof(ULONG),1,fp)) return 0;
-
-	delete[] mCartBank0;
-	delete[] mCartBank1;
-	mCartBank0 = new UBYTE[mMaskBank0+1];
-	mCartBank1 = new UBYTE[mMaskBank1+1];
-	if(!lss_read(mCartBank0,sizeof(UBYTE),mMaskBank0+1,fp)) return 0;
-	if(!lss_read(mCartBank1,sizeof(UBYTE),mMaskBank1+1,fp)) return 0;
-	return 1;
 }
 
 inline void CCart::Poke(ULONG addr, UBYTE data)
@@ -410,12 +316,10 @@ void CCart::CartAddressStrobe(bool strobe)
 		mShifter&=0xff;
 	}
 	last_strobe=mStrobe;
-	TRACE_CART2("CartAddressStrobe(strobe=%d) mShifter=$%06x",strobe,mShifter);
 }
 
 void CCart::CartAddressData(bool data)
 {
-	TRACE_CART1("CartAddressData($%02x)",data);
 	mAddrData=data;
 }
 
@@ -475,4 +379,87 @@ UBYTE CCart::Peek1(void)
 	}
 
 	return data;
+}
+
+bool CCart::ContextSave(FILE *fp)
+{
+	if(!fprintf(fp,"CCart::ContextSave")) return 0;
+	if(!fwrite(&mCounter,sizeof(ULONG),1,fp)) return 0;
+	if(!fwrite(&mShifter,sizeof(ULONG),1,fp)) return 0;
+	if(!fwrite(&mAddrData,sizeof(ULONG),1,fp)) return 0;
+	if(!fwrite(&mStrobe,sizeof(ULONG),1,fp)) return 0;
+	if(!fwrite(&mShiftCount0,sizeof(ULONG),1,fp)) return 0;
+	if(!fwrite(&mCountMask0,sizeof(ULONG),1,fp)) return 0;
+	if(!fwrite(&mShiftCount1,sizeof(ULONG),1,fp)) return 0;
+	if(!fwrite(&mCountMask1,sizeof(ULONG),1,fp)) return 0;
+	if(!fwrite(&mBank,sizeof(EMMODE),1,fp)) return 0;
+	if(!fwrite(&mWriteEnableBank0,sizeof(ULONG),1,fp)) return 0;
+	if(!fwrite(&mWriteEnableBank1,sizeof(ULONG),1,fp)) return 0;
+
+	if(!fwrite(&mCartRAM,sizeof(ULONG),1,fp)) return 0;
+	if(mCartRAM)
+	{
+		if(!fwrite(&mMaskBank1,sizeof(ULONG),1,fp)) return 0;
+		if(!fwrite(mCartBank1,sizeof(UBYTE),mMaskBank1+1,fp)) return 0;
+	}
+	return 1;
+}
+
+bool CCart::ContextLoad(LSS_FILE *fp)
+{
+	char teststr[100]="XXXXXXXXXXXXXXXXXX";
+	if(!lss_read(teststr,sizeof(char),18,fp)) return 0;
+	if(strcmp(teststr,"CCart::ContextSave")!=0) return 0;
+	if(!lss_read(&mCounter,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mShifter,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mAddrData,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mStrobe,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mShiftCount0,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mCountMask0,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mShiftCount1,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mCountMask1,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mBank,sizeof(EMMODE),1,fp)) return 0;
+	if(!lss_read(&mWriteEnableBank0,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mWriteEnableBank1,sizeof(ULONG),1,fp)) return 0;
+
+	if(!lss_read(&mCartRAM,sizeof(ULONG),1,fp)) return 0;
+	if(mCartRAM)
+	{
+		if(!lss_read(&mMaskBank1,sizeof(ULONG),1,fp)) return 0;
+		delete[] mCartBank1;
+		mCartBank1 = new UBYTE[mMaskBank1+1];
+		if(!lss_read(mCartBank1,sizeof(UBYTE),mMaskBank1+1,fp)) return 0;
+	}
+	return 1;
+}
+
+bool CCart::ContextLoadLegacy(LSS_FILE *fp)
+{
+	strcpy(mName,"<** IMAGE **>");
+	strcpy(mManufacturer,"<** RESTORED **>");
+	char teststr[100]="XXXXXXXXXXXXXXXXXX";
+	if(!lss_read(teststr,sizeof(char),18,fp)) return 0;
+	if(strcmp(teststr,"CCart::ContextSave")!=0) return 0;
+	if(!lss_read(&mRotation,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mHeaderLess,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mCounter,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mShifter,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mAddrData,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mStrobe,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mShiftCount0,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mCountMask0,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mShiftCount1,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mCountMask1,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mBank,sizeof(EMMODE),1,fp)) return 0;
+
+	if(!lss_read(&mMaskBank0,sizeof(ULONG),1,fp)) return 0;
+	if(!lss_read(&mMaskBank1,sizeof(ULONG),1,fp)) return 0;
+
+	delete[] mCartBank0;
+	delete[] mCartBank1;
+	mCartBank0 = new UBYTE[mMaskBank0+1];
+	mCartBank1 = new UBYTE[mMaskBank1+1];
+	if(!lss_read(mCartBank0,sizeof(UBYTE),mMaskBank0+1,fp)) return 0;
+	if(!lss_read(mCartBank1,sizeof(UBYTE),mMaskBank1+1,fp)) return 0;
+	return 1;
 }

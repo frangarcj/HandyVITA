@@ -3,6 +3,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <malloc.h>
 
 #include <psp2/ctrl.h>
@@ -16,8 +17,6 @@
 #include "../lynx/lynxdef.h"
 #include "utils.h"
 #include "draw.h"
-
-#include "PONG2_bin.h"
 
 /*extern "C" void __cxa_pure_virtual()
 {
