@@ -150,13 +150,13 @@ int main()
 		if (keys_down & PSP2_CTRL_START) {
 			pause = !pause;
 		}
-    printf("starting frame");
+    //printf("starting frame");
 		while(!newFrame)
     {
         lynx->Update();
     }
 
-    printf("ending frame");
+    //printf("ending frame");
     newFrame = false;
 
 
