@@ -13,19 +13,19 @@ void C65C02::Reset()
 	mOpcode=0;
 	mOperand=0;
 	mPC=CPU_PEEKW(BOOT_VECTOR);
-	mN=FALSE;
-	mV=FALSE;
-	mB=FALSE;
-	mD=FALSE;
-	mI=TRUE;
-	mZ=TRUE;
-	mC=FALSE;
-	mIRQActive=FALSE;
+	mN=false;
+	mV=false;
+	mB=false;
+	mD=false;
+	mI=true;
+	mZ=true;
+	mC=false;
+	mIRQActive=false;
 
-	mSystem.gSystemNMI=FALSE;
-	mSystem.gSystemIRQ=FALSE;
-	mSystem.gSystemCPUSleep=FALSE;
-	mSystem.gSystemCPUSleep_Saved=FALSE;
+	mSystem.gSystemNMI=false;
+	mSystem.gSystemIRQ=false;
+	mSystem.gSystemCPUSleep=false;
+	mSystem.gSystemCPUSleep_Saved=false;
 }
 
 void C65C02::SetRegs(C6502_REGS &regs)
@@ -68,7 +68,7 @@ void C65C02::Update()
 //			if(mNMI)
 //			{
 //				// Mark the NMI as services
-//				mNMI=FALSE;
+//				mNMI=false;
 //				mProcessingInterrupt++;
 //
 //				// Push processor status
@@ -80,7 +80,8 @@ void C65C02::Update()
 //				mPC=CPU_PEEKW(NMI_VECTOR);
 //			}
 
-//    printf( "cpu update\n");
+//if(mSystem.gSystemCycleCount>=2511828)
+	//printf( "start cpu update inside %lu",mSystem.gSystemCPUSleep);
 
 if(mSystem.gSystemIRQ && !mI)
 {
@@ -89,25 +90,25 @@ TRACE_CPU1("Update() IRQ taken at PC=%04x",mPC);
 // is the only source of interrupts
 
 // Push processor status
-	PUSH(mPC>>8);
+PUSH(mPC>>8);
 PUSH(mPC&0xff);
 PUSH(PS()&0xef);		// Clear B flag on stack
 
-mI=TRUE;				// Stop further interrupts
-mD=FALSE;				// Clear decimal mode
+mI=true;				// Stop further interrupts
+mD=false;				// Clear decimal mode
 
 // Pick up the new PC
 mPC=CPU_PEEKW(IRQ_VECTOR);
 
 // Save the sleep state as an irq has possibly woken the processor
 mSystem.gSystemCPUSleep_Saved=mSystem.gSystemCPUSleep;
-mSystem.gSystemCPUSleep=FALSE;
+mSystem.gSystemCPUSleep=false;
 
 // Log the irq entry time
 mSystem.gIRQEntryCycle=mSystem.gSystemCycleCount;
 
 // Clear the interrupt status line
-mSystem.gSystemIRQ=FALSE;
+mSystem.gSystemIRQ=false;
 }
 
 //
@@ -115,12 +116,17 @@ mSystem.gSystemIRQ=FALSE;
 //
 if(mSystem.gSystemCPUSleep) return;
 
+//if(mSystem.gSystemCycleCount>=2511828)
+	//printf( "start cpu update inside %lu",mSystem.gSystemCPUSleep);
+
 // Fetch opcode
 mOpcode=CPU_PEEK(mPC);
 TRACE_CPU2("Update() PC=$%04x, Opcode=%02x",mPC,mOpcode);
 mPC++;
 
 // Execute Opcode
+//if(mSystem.gSystemCycleCount>=2511828)
+	//printf( "start cpu update inside %lu",mOpcode);
 
 switch(mOpcode)
 {
@@ -1066,6 +1072,7 @@ case 0xAD:
 	mSystem.gSystemCycleCount+=(1+(3*CPU_RDWR_CYC));
 	xABSOLUTE();
 	xLDA();
+	//printf("we");
 	break;
 case 0xAE:
 	mSystem.gSystemCycleCount+=(1+(3*CPU_RDWR_CYC));

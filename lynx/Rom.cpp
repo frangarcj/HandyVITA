@@ -58,8 +58,8 @@
 
 CRom::CRom(const char *romfile)
 {
-	mWriteEnable = FALSE;
-	mValid = FALSE;
+	mWriteEnable = false;
+	mValid = false;
 	strncpy(mFileName,romfile,1024);
 	Reset();
 
@@ -94,11 +94,11 @@ CRom::CRom(const char *romfile)
 	UBYTE mRomCheck[16]={0x38,0x80,0x0A,0x90,0x04,0x8E,0x8B,0xFD,
 						 0x18,0xE8,0x8E,0x87,0xFD,0xA2,0x02,0x8E};
 
-	static bool firsttime=TRUE;
+	static bool firsttime=true;
 
 	if(firsttime)
 	{
-		firsttime=FALSE;
+		firsttime=false;
 		for(ULONG loop=0;loop<16;loop++)
 		{
 			if(mRomCheck[loop]!=mRomData[loop])
@@ -111,7 +111,7 @@ CRom::CRom(const char *romfile)
 		}
 	}
 
-	mValid = TRUE;
+	mValid = true;
 }
 
 void CRom::Reset(void)

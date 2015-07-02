@@ -149,7 +149,7 @@ inline void CMemMap::Poke(ULONG addr, UBYTE data)
 	int newstate,loop;
 
 	// FC00-FCFF Susie area
-	newstate=(data&0x01)?FALSE:TRUE;
+	newstate=(data&0x01)?false:true;
 	if(newstate!=mSusieEnabled)
 	{
 		mSusieEnabled=newstate;
@@ -165,7 +165,7 @@ inline void CMemMap::Poke(ULONG addr, UBYTE data)
 	}
 
 	// FD00-FCFF Mikie area
-	newstate=(data&0x02)?FALSE:TRUE;
+	newstate=(data&0x02)?false:true;
 	if(newstate!=mMikieEnabled)
 	{
 		mMikieEnabled=newstate;
@@ -181,7 +181,7 @@ inline void CMemMap::Poke(ULONG addr, UBYTE data)
 	}
 
 	// FE00-FFF7 Rom area
-	newstate=(data&0x04)?FALSE:TRUE;
+	newstate=(data&0x04)?false:true;
 	if(newstate!=mRomEnabled)
 	{
 		mRomEnabled=newstate;
@@ -197,7 +197,7 @@ inline void CMemMap::Poke(ULONG addr, UBYTE data)
 	}
 
 	// FFFA-FFFF Vector area - Overload ROM space
-	newstate=(data&0x08)?FALSE:TRUE;
+	newstate=(data&0x08)?false:true;
 	if(newstate!=mVectorsEnabled)
 	{
 		mVectorsEnabled=newstate;

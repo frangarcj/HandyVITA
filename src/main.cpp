@@ -41,7 +41,7 @@ static CSystem *lynx = NULL;
 
 unsigned char* lynx_display_callback(ULONG objref)
 {
-    printf("lynx_display_callback %d",initialized);
+   //printf("lynx_display_callback %d",initialized);
     if(!initialized)
     {
         return (UBYTE*)framebuffer;
@@ -51,7 +51,7 @@ unsigned char* lynx_display_callback(ULONG objref)
 
     //video_cb(framebuffer, lynx_width, lynx_height, 160*2);
     blit_scale(framebuffer,pos_x,pos_y,lynx_width,lynx_height,scale);
-    printf("blit_scale done");
+   //printf("blit_scale done");
 
     /*if(gAudioBufferPointer > 0)
     {
@@ -80,11 +80,11 @@ int main()
 		= (char*)malloc(sizeof(char) * (strlen("cache0:/VitaDefilerClient/Documents/rom.lnx")));
 	sprintf(path, "cache0:/VitaDefilerClient/Documents/rom.lnx");
 
-  printf("Loading lynx.... %s",path);
+ //printf("Loading lynx.... %s",path);
 
   lynx = new CSystem(path, system_rom);
 
-  printf("Lynx loaded: %p",lynx);
+ //printf("Lynx loaded: %p",lynx);
 
   ULONG rot = MIKIE_NO_ROTATE;
   lynx_width = 160;
@@ -150,13 +150,13 @@ int main()
 		if (keys_down & PSP2_CTRL_START) {
 			pause = !pause;
 		}
-    printf("starting frame");
-		while(!newFrame)
+   //printf("starting frame");
+		while(!newFrame&&!pause)
     {
         lynx->Update();
     }
 
-    printf("ending frame");
+   //printf("ending frame");
     newFrame = false;
 
 

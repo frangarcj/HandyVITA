@@ -59,10 +59,10 @@ CCart::CCart(UBYTE *gamedata,ULONG gamesize)
 
   LYNX_HEADER	header;
 
-	mWriteEnableBank0=FALSE;
-	mWriteEnableBank1=FALSE;
-	mCartRAM=FALSE;
-	mHeaderLess=FALSE;
+	mWriteEnableBank0=false;
+	mWriteEnableBank1=false;
+	mCartRAM=false;
+	mHeaderLess=false;
 	mCRC32=0;
 	mCRC32=crc32(mCRC32,gamedata,gamesize);
 
@@ -82,7 +82,7 @@ CCart::CCart(UBYTE *gamedata,ULONG gamesize)
 
 		if(header.magic[0]!='L' || header.magic[1]!='Y' || header.magic[2]!='N' || header.magic[3]!='X' || header.version!=1)
 		{
-		    printf("Invalid cart.\n");
+		   //printf("Invalid cart.\n");
 		}
 
 		// Setup name & manufacturer
@@ -149,7 +149,7 @@ CCart::CCart(UBYTE *gamedata,ULONG gamesize)
 			break;
 		default:
 		  banktype0=UNUSED;
-			printf("Invalid cart.\n");
+			printf("Invalid cart.");
 			break;
 	}
 
@@ -187,7 +187,7 @@ CCart::CCart(UBYTE *gamedata,ULONG gamesize)
 			break;
 		default:
 		  banktype1=UNUSED;
-			printf("Invalid cart.\n");
+			printf("Invalid cart.");
 			break;
 	}
 
@@ -232,10 +232,10 @@ CCart::CCart(UBYTE *gamedata,ULONG gamesize)
 		//
 		// Check if this is a headerless cart
 		//
-		mHeaderLess=TRUE;
+		mHeaderLess=true;
 		for(int loop=0;loop<32;loop++)
 		{
-			if(mCartBank0[loop&mMaskBank0]!=0x00) mHeaderLess=FALSE;
+			if(mCartBank0[loop&mMaskBank0]!=0x00) mHeaderLess=false;
 		}
 	}
 
@@ -251,8 +251,8 @@ CCart::CCart(UBYTE *gamedata,ULONG gamesize)
 		mCountMask1=0x0ff;
 		mCartBank1 = (UBYTE*) new UBYTE[mMaskBank1+1];
 		memset(mCartBank1, DEFAULT_RAM_CONTENTS, mMaskBank1+1);
-		mWriteEnableBank1=TRUE;
-		mCartRAM=TRUE;
+		mWriteEnableBank1=true;
+		mCartRAM=true;
 	}
 }
 

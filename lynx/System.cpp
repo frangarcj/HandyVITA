@@ -133,7 +133,7 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 {
 
 
-  printf("inside");
+ //printf("inside");
 
 #ifdef _LYNXDBG
 	mpDebugCallback=NULL;
@@ -212,7 +212,7 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 
 	// An exception from this will be caught by the level above
 	printf("mFileType %lu",mFileType);
-  printf("Creating cart");
+ //printf("Creating cart");
 	switch(mFileType)
 	{
 		case HANDY_FILETYPE_LNX:
@@ -232,7 +232,7 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 				// Open the howard file for reading
 				if((fp=fopen(cartgo,"rb"))==NULL)
 				{
-                    printf( "Invalid Cart.\n");
+                   //printf( "Invalid Cart.\n");
                     delete filememory;
 				}
 
@@ -245,7 +245,7 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 				if(fread(howardmemory,sizeof(char),howardsize,fp)!=howardsize)
 				{
 					delete howardmemory;
-                    printf( "Invalid Cart.\n");
+                   //printf( "Invalid Cart.\n");
                     delete filememory;
 				}
 
@@ -274,22 +274,22 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 	}
 
 	// These can generate exceptions
-  printf("Loading Mikie");
+ //printf("Loading Mikie");
 	mMikie = new CMikie(*this);
 	printf("Loading Susie");
 	mSusie = new CSusie(*this);
 
 // Instantiate the memory map handler
-  printf("Loading MemMap");
+ //printf("Loading MemMap");
 	mMemMap = new CMemMap(*this);
 
 // Now the handlers are set we can instantiate the CPU as is will use handlers on reset
-  printf("Loading CPU");
+ //printf("Loading CPU");
 	mCpu = new C65C02(*this);
 
 // Now init is complete do a reset, this will cause many things to be reset twice
 // but what the hell, who cares, I don't.....
-  printf("Reset");
+ //printf("Reset");
 	Reset();
 
 // If this is a snapshot type then restore the context
@@ -333,7 +333,7 @@ bool CSystem::IsZip(char *filename)
 		return(memcmp(buf,"PK",2)==0);
 	}
 	if(fp)fclose(fp);
-	return FALSE;
+	return false;
 }
 
 void CSystem::HLE_BIOS_init()
@@ -402,13 +402,13 @@ void CSystem::Reset(void)
 	gSystemCycleCount=0;
 	gNextTimerEvent=0;
 	gCPUBootAddress=0;
-	gBreakpointHit=FALSE;
-	gSingleStepMode=FALSE;
-	gSingleStepModeSprites=FALSE;
-	gSystemIRQ=FALSE;
-	gSystemNMI=FALSE;
-	gSystemCPUSleep=FALSE;
-	gSystemHalt=FALSE;
+	gBreakpointHit=false;
+	gSingleStepMode=false;
+	gSingleStepModeSprites=false;
+	gSystemIRQ=false;
+	gSystemNMI=false;
+	gSystemCPUSleep=false;
+	gSystemHalt=false;
 
 	gThrottleLastTimerCount=0;
 	gThrottleNextCycleCheckpoint=0;
@@ -420,7 +420,7 @@ void CSystem::Reset(void)
 	memset(gAudioBuffer,128,HANDY_AUDIO_BUFFER_SIZE);
 
 #ifdef _LYNXDBG
-	gSystemHalt=TRUE;
+	gSystemHalt=true;
 #endif
 
 	mMemMap->Reset();
@@ -448,6 +448,40 @@ void CSystem::Reset(void)
 		mCpu->SetRegs(regs);
 	}
 }
+
+void CSystem::Update()
+{
+		  //if(gSystemCycleCount>2511828)
+				//printf( "sys update %lu,%lu",gSystemCycleCount,gNextTimerEvent);
+			//
+			// Only update if there is a predicted timer event
+			//
+			if(gSystemCycleCount>=gNextTimerEvent)
+			{
+				//printf("Start Mikie - update");
+				mMikie->Update();
+				//printf("Stop Mikie - update");
+				//printf( "sys update %lu,%lu",gSystemCycleCount,gSystemCPUSleep);
+			}
+			//
+			// Step the processor through 1 instruction
+			//
+
+
+			mCpu->Update();
+
+
+			//
+			// If the CPU is asleep then skip to the next timer event
+			//
+			if(gSystemCPUSleep)
+			{
+				gSystemCycleCount=gNextTimerEvent;
+			}
+
+			//printf( "end sys update");
+}
+
 
 bool CSystem::ContextSave(const char *context)
 {
@@ -569,10 +603,10 @@ bool CSystem::MemoryContextLoad(const char *context, size_t size)
 
 	if(strcmp(teststr,LSS_VERSION)==0 || strcmp(teststr,LSS_VERSION_OLD)==0)
 	{
-		bool legacy=FALSE;
+		bool legacy=false;
 		if(strcmp(teststr,LSS_VERSION_OLD)==0)
 		{
-			legacy=TRUE;
+			legacy=true;
 		}
 		else
 		{
@@ -681,10 +715,10 @@ bool CSystem::ContextLoad(const char *context)
 
 	if(strcmp(teststr,LSS_VERSION)==0 || strcmp(teststr,LSS_VERSION_OLD)==0)
 	{
-		bool legacy=FALSE;
+		bool legacy=false;
 		if(strcmp(teststr,LSS_VERSION_OLD)==0)
 		{
-			legacy=TRUE;
+			legacy=true;
 		}
 		else
 		{
@@ -695,7 +729,7 @@ bool CSystem::ContextLoad(const char *context)
 			{
 				delete fp;
 				delete filememory;
-				printf( "[handy]LSS Snapshot CRC does not match the loaded cartridge image, aborting load.\n");
+				printf( "[handy]LSS Snapshot CRC does not match the loaded cartridge image, aborting load.");
 				return 0;
 			}
 		}

@@ -79,21 +79,21 @@
 	ULONG	gCPUWakeupTime=0;
 	ULONG	gIRQEntryCycle=0;
 	ULONG	gCPUBootAddress=0;
-	ULONG	gBreakpointHit=FALSE;
-	ULONG	gSingleStepMode=FALSE;
-	ULONG	gSingleStepModeSprites=FALSE;
-	ULONG	gSystemIRQ=FALSE;
-	ULONG	gSystemNMI=FALSE;
-	ULONG	gSystemCPUSleep=FALSE;
-	ULONG	gSystemCPUSleep_Saved=FALSE;
-	ULONG	gSystemHalt=FALSE;
+	ULONG	gBreakpointHit=false;
+	ULONG	gSingleStepMode=false;
+	ULONG	gSingleStepModeSprites=false;
+	ULONG	gSystemIRQ=false;
+	ULONG	gSystemNMI=false;
+	ULONG	gSystemCPUSleep=false;
+	ULONG	gSystemCPUSleep_Saved=false;
+	ULONG	gSystemHalt=false;
 	ULONG	gThrottleMaxPercentage=100;
 	ULONG	gThrottleLastTimerCount=0;
 	ULONG	gThrottleNextCycleCheckpoint=0;
 
 	volatile ULONG gTimerCount=0;
 
-	ULONG	gAudioEnabled=FALSE;
+	ULONG	gAudioEnabled=false;
 	UBYTE	gAudioBuffer[HANDY_AUDIO_BUFFER_SIZE];
 	ULONG	gAudioBufferPointer=0;
 	ULONG	gAudioLastUpdateCycle=0;
@@ -185,44 +185,7 @@ class CSystem : public CSystemBase
 		bool	ContextLoad(const char *context);
 		bool	IsZip(char *filename);
 
-		inline void Update(void)
-		{
-		  printf( "sys update %lu,%lu",gSystemCycleCount,gNextTimerEvent);
-			//
-			// Only update if there is a predicted timer event
-			//
-			if(gSystemCycleCount>=gNextTimerEvent)
-			{
-				printf("Start Mikie - update");
-				mMikie->Update();
-				printf("Stop Mikie - update");
-			}
-			//
-			// Step the processor through 1 instruction
-			//
-			mCpu->Update();
-			//printf( "end cpu update");
-
-#ifdef _LYNXDBG
-			// Check breakpoint
-			static ULONG lastcycle=0;
-			if(lastcycle<mCycleCountBreakpoint && gSystemCycleCount>=mCycleCountBreakpoint) gBreakpointHit=TRUE;
-			lastcycle=gSystemCycleCount;
-
-			// Check single step mode
-			if(gSingleStepMode) gBreakpointHit=TRUE;
-#endif
-
-			//
-			// If the CPU is asleep then skip to the next timer event
-			//
-			if(gSystemCPUSleep)
-			{
-				gSystemCycleCount=gNextTimerEvent;
-			}
-
-			//printf( "end sys update");
-		}
+	  void Update(void);
 
 		//
 		// We MUST have separate CPU & RAM peek & poke handlers as all CPU accesses must
@@ -319,21 +282,21 @@ class CSystem : public CSystemBase
 		ULONG	gCPUWakeupTime=0;
 		ULONG	gIRQEntryCycle=0;
 		ULONG	gCPUBootAddress=0;
-		ULONG	gBreakpointHit=FALSE;
-		ULONG	gSingleStepMode=FALSE;
-		ULONG	gSingleStepModeSprites=FALSE;
-		ULONG	gSystemIRQ=FALSE;
-		ULONG	gSystemNMI=FALSE;
-		ULONG	gSystemCPUSleep=FALSE;
-		ULONG	gSystemCPUSleep_Saved=FALSE;
-		ULONG	gSystemHalt=FALSE;
+		ULONG	gBreakpointHit=false;
+		ULONG	gSingleStepMode=false;
+		ULONG	gSingleStepModeSprites=false;
+		ULONG	gSystemIRQ=false;
+		ULONG	gSystemNMI=false;
+		ULONG	gSystemCPUSleep=false;
+		ULONG	gSystemCPUSleep_Saved=false;
+		ULONG	gSystemHalt=false;
 		ULONG	gThrottleMaxPercentage=100;
 		ULONG	gThrottleLastTimerCount=0;
 		ULONG	gThrottleNextCycleCheckpoint=0;
 
 		volatile ULONG gTimerCount=0;
 
-		ULONG	gAudioEnabled=FALSE;
+		ULONG	gAudioEnabled=false;
 		UBYTE	gAudioBuffer[HANDY_AUDIO_BUFFER_SIZE];
 		ULONG	gAudioBufferPointer=0;
 		ULONG	gAudioLastUpdateCycle=0;

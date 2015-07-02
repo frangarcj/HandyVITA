@@ -68,12 +68,12 @@ typedef unsigned long ULONG;
 //    4 cycles is 250ns - NORMAL MODE CYCLE
 //
 
-#ifndef TRUE
-#define TRUE	true
+#ifndef true
+#define true	true
 #endif
 
-#ifndef FALSE
-#define FALSE	false
+#ifndef false
+#define false	false
 #endif
 
 #include "lynxbase.h"

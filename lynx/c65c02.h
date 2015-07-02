@@ -200,9 +200,9 @@ class C65C02
 	//
 			inline void xILLEGAL(void)
 			{
-				char addr[1024];
-				sprintf(addr,"C65C02::Update() - Illegal opcode (%02x) at PC=$%04x.",mOpcode,mPC);
-	            printf("C65C02::Update() - Illegal opcode (%02x) at PC=$%04x.",mOpcode,mPC);
+				//char addr[1024];
+				//sprintf(addr,"C65C02::Update() - Illegal opcode (%02x) at PC=$%04x.",mOpcode,mPC);
+	     //printf("C65C02::Update() - Illegal opcode (%02x) at PC=$%04x.",mOpcode,mPC);
 			}
 	private:
 

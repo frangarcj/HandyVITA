@@ -61,7 +61,7 @@ CRam::CRam(UBYTE *filememory,ULONG filesize,CSystem& parent)
 
 	// Take a copy into the backup buffer for restore on reset
 	mFileSize=filesize;
-  printf("RAM:%lu",filesize);
+ //printf("RAM:%lu",filesize);
 	if(filesize)
 	{
 		// Take a copy of the ram data
@@ -97,10 +97,10 @@ CRam::~CRam()
 void CRam::Reset(void)
 {
 	// Open up the file
-  printf("mFileSize%lu,%d",mFileSize,sizeof(HOME_HEADER));
+ //printf("mFileSize%lu,%d",mFileSize,sizeof(HOME_HEADER));
 	if(mFileSize >= sizeof(HOME_HEADER))
 	{
-		printf("if");
+		//printf("if");
 		HOME_HEADER	header;
 		UBYTE tmp;
 		int data_size;
