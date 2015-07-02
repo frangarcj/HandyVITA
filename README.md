@@ -3,7 +3,17 @@ Based on Libretro Handy core (https://github.com/libretro/libretro-handy)
 
 Download --> https://www.dropbox.com/s/hmy7e8la3k2ete4/HANDY.1.0.velf?dl=0
 
-Upload lynxboot.img and rom.lnx to VitaDefilerClient\Documents with FTPVita https://github.com/xerpi/FTPVita
+Upload lynxboot.img and rom.lnx to VitaDefilerClient\Documents 
+
+with FTPVita https://github.com/xerpi/FTPVita
+
+-- or --
+
+editing uvloader.vds script (Thanks SMOKE587)
+
+push lynxboot.img /Documents/lynxboot.img
+
+push rom.lnx /Documents/rom.lnx
 
 Controls
 
