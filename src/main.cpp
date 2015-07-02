@@ -24,6 +24,9 @@
 }
 
 extern "C" void *__dso_handle = NULL;*/
+
+const SceSize sceUserMainThreadStackSize = 100*1024*1024;
+
 static uint8_t lynx_width = 160;
 static uint8_t lynx_height = 102;
 
