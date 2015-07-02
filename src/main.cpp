@@ -24,6 +24,9 @@
 }
 
 extern "C" void *__dso_handle = NULL;*/
+
+const SceSize sceUserMainThreadStackSize = 8*1024*1024;
+
 static uint8_t lynx_width = 160;
 static uint8_t lynx_height = 102;
 
@@ -39,9 +42,23 @@ static bool initialized = false;
 
 static CSystem *lynx = NULL;
 
+struct map { unsigned psp2; unsigned lynx; };
+
+static map btn_map_no_rot[] = {
+  { PSP2_CTRL_CIRCLE, BUTTON_A },
+  { PSP2_CTRL_CROSS, BUTTON_B },
+  { PSP2_CTRL_RIGHT, BUTTON_RIGHT },
+  { PSP2_CTRL_LEFT, BUTTON_LEFT },
+  { PSP2_CTRL_UP, BUTTON_UP },
+  { PSP2_CTRL_DOWN, BUTTON_DOWN },
+  { PSP2_CTRL_LTRIGGER, BUTTON_OPT1 },
+  { PSP2_CTRL_RTRIGGER, BUTTON_OPT2 },
+  { PSP2_CTRL_START, BUTTON_PAUSE },
+};
+
 unsigned char* lynx_display_callback(ULONG objref)
 {
-   //printf("lynx_display_callback %d",initialized);
+    //printf("lynx_display_callback %d",initialized);
     if(!initialized)
     {
         return (UBYTE*)framebuffer;
@@ -51,7 +68,6 @@ unsigned char* lynx_display_callback(ULONG objref)
 
     //video_cb(framebuffer, lynx_width, lynx_height, 160*2);
     blit_scale(framebuffer,pos_x,pos_y,lynx_width,lynx_height,scale);
-   //printf("blit_scale done");
 
     /*if(gAudioBufferPointer > 0)
     {
@@ -62,6 +78,31 @@ unsigned char* lynx_display_callback(ULONG objref)
 
     newFrame = true;
     return (UBYTE*)framebuffer;
+}
+
+unsigned get_lynx_input(SceCtrlData pad)
+{
+    unsigned res = 0;
+    unsigned int keys_down = pad.buttons;
+
+    for (unsigned i = 0; i < sizeof(btn_map_no_rot) / sizeof(map); ++i)
+    {
+        res |= keys_down & btn_map_no_rot[i].psp2 ? btn_map_no_rot[i].lynx : 0;
+    }
+
+    if (pad.buttons & PSP2_CTRL_SQUARE) {
+			scale--;
+			if (scale < 1) scale = 1;
+			pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
+			pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
+		} else if (pad.buttons & PSP2_CTRL_TRIANGLE) {
+			scale++;
+			if (scale > 5) scale = 5;
+			pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
+			pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
+		}
+
+    return res;
 }
 
 PSP2_MODULE_INFO(0, 0, "handyvita")
@@ -95,7 +136,7 @@ int main()
 	//chip8_init(&chip8, 64, 32);
 	//chip8_loadrom_memory(&chip8, PONG2_bin, PONG2_bin_size);
 
-	scale = 2;
+	scale = 1;
 	pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
 	pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
 	initialized = true;
@@ -105,11 +146,13 @@ int main()
 
 		sceCtrlPeekBufferPositive(0, (SceCtrlData *)&pad, 1);
 
-		font_draw_stringf(10, 10, BLACK, "HANDY emulator by frangarcj");
+		font_draw_stringf(10, 10, WHITE, "HandyVITA emulator by frangarcj");
 
-		unsigned int keys_down = pad.buttons & ~old_pad.buttons;
-		unsigned int keys_up = ~pad.buttons & old_pad.buttons;
+    lynx->SetButtonData(get_lynx_input(pad));
 
+		/*unsigned int keys_down = pad.buttons & ~old_pad.buttons;
+		unsigned int keys_up = ~pad.buttons & old_pad.buttons;*/
+    /*
 		if (keys_down & PSP2_CTRL_UP) {
 			//chip8_key_press(&chip8, 1);
 		} else if (keys_up & PSP2_CTRL_UP) {
@@ -130,38 +173,35 @@ int main()
 			//chip8_key_press(&chip8, 0xD);
 		} else if (keys_up & PSP2_CTRL_CROSS) {
 			//chip8_key_release(&chip8, 0xD);
-		}
+		}*/
 
-		if (pad.buttons & PSP2_CTRL_LTRIGGER) {
+		/*if (pad.buttons & PSP2_CTRL_LTRIGGER) {
 			scale--;
 			if (scale < 1) scale = 1;
-			/* Re-center the image */
 			pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
 			pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
 		} else if (pad.buttons & PSP2_CTRL_RTRIGGER) {
 			scale++;
-			/* Don't go outside of the screen! */
 			if ((lynx_width*scale) > SCREEN_W) scale--;
-			/* Re-center the image */
 			pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
 			pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
 		}
 
 		if (keys_down & PSP2_CTRL_START) {
 			pause = !pause;
-		}
+		}*/
    //printf("starting frame");
 		while(!newFrame&&!pause)
     {
         lynx->Update();
     }
 
-   //printf("ending frame");
+    //printf("ending frame");
     newFrame = false;
 
 
 		if (pause) {
-			font_draw_stringf(SCREEN_W/2 - 40, SCREEN_H - 50, BLACK, "PAUSE");
+			font_draw_stringf(SCREEN_W/2 - 40, SCREEN_H - 50, WHITE, "PAUSE");
 		}
 
 		old_pad = pad;

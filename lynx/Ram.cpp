@@ -121,9 +121,9 @@ void CRam::Reset(void)
 		memset(mRamData+header.load_address+data_size, 0x00, RAM_SIZE-header.load_address-data_size);
 		mSystem.gCPUBootAddress=header.load_address;
 	} else {
-		printf("else");
+		//printf("else");
 		memset(mRamData, DEFAULT_RAM_CONTENTS, RAM_SIZE);
-		printf("memset");
+		//printf("memset");
 	}
 }
 

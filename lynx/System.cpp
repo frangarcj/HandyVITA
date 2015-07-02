@@ -140,6 +140,8 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 	mDebugCallbackObject=0;
 #endif
 
+  gAudioEnabled=true;
+
 	// Select the default filetype
 	UBYTE *filememory=NULL;
 	UBYTE *howardmemory=NULL;
@@ -451,9 +453,7 @@ void CSystem::Reset(void)
 
 void CSystem::Update()
 {
-		  //if(gSystemCycleCount>2511828)
-				//printf( "sys update %lu,%lu",gSystemCycleCount,gNextTimerEvent);
-			//
+		  	//
 			// Only update if there is a predicted timer event
 			//
 			if(gSystemCycleCount>=gNextTimerEvent)
