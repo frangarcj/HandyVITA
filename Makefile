@@ -23,9 +23,9 @@ CXXFILES   := $(foreach dir,$(SOURCES), $(wildcard $(dir)/*.cpp))
 OBJS     := $(CFILES:.c=.o) $(BUILD_APP) $(CXXFILES:.cpp=.o)
 
 LIBS = -lvita2d -lm -lSceDisplay_stub -lSceGxm_stub 	\
-	-lSceCtrl_stub
+	-lSceCtrl_stub -lSceAudio_stub
 
-DEFINES	=	-DPSP -DLSB_FIRST -DWANT_CRC32
+DEFINES	=	-DPSP -DLSB_FIRST -DWANT_CRC32 -DLINUX_PATCH
 
 
 
