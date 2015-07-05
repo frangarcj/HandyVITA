@@ -1,7 +1,20 @@
+HANDYVita
+=========
+
 The first Atari Linx emulator for the PSVita
+
 Based on Libretro Handy core (https://github.com/libretro/libretro-handy)
 
-Download --> https://www.dropbox.com/s/hmy7e8la3k2ete4/HANDY.1.0.velf?dl=0
+Download Version 1.1
+--------------------
+https://www.dropbox.com/s/tk4cv6h70vyg1v3/HANDY.1.1.velf?dl=0
+
+### Release Notes
+
+GPU scaling thanks to xerpi with vita2dlib https://github.com/xerpi/vita2dlib
+
+Instructions
+-------------
 
 Upload lynxboot.img and rom.lnx to VitaDefilerClient\Documents 
 
