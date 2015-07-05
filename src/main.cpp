@@ -113,30 +113,21 @@ unsigned get_lynx_input(SceCtrlData pad)
     return res;
 }
 
-PSP2_MODULE_INFO(0, 0, "handyvita")
-int main()
-{
-	SceCtrlData pad, old_pad;
-	//struct chip8_context chip8;
-	int pause = 0;
-
-	vita2d_init();
-
-
-	char *system_rom
+int emulate(char *path){
+  char *system_rom
     = (char*)malloc(sizeof(char) * (strlen("cache0:/VitaDefilerClient/Documents/") + 13));
   sprintf(system_rom, "%slynxboot.img", "cache0:/VitaDefilerClient/Documents/");
 
-	char *path
-		= (char*)malloc(sizeof(char) * (strlen("cache0:/VitaDefilerClient/Documents/rom.lnx")));
-	sprintf(path, "cache0:/VitaDefilerClient/Documents/rom.lnx");
+
 
  //printf("Loading lynx.... %s",path);
 
   lynx = new CSystem(path, system_rom);
 
  //printf("Lynx loaded: %p",lynx);
+  int pause = 0;
 
+  SceCtrlData pad, old_pad;
   ULONG rot = MIKIE_NO_ROTATE;
   lynx_width = 160;
   lynx_height = 102;
@@ -146,7 +137,7 @@ int main()
 	//chip8_init(&chip8, 64, 32);
 	//chip8_loadrom_memory(&chip8, PONG2_bin, PONG2_bin_size);
 
-	scale = 1;
+	scale = 5;
 	pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
 	pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
 	initialized = true;
@@ -157,10 +148,10 @@ int main()
 
     lynx->SetButtonData(get_lynx_input(pad));
 
+    //font_draw_stringf(10, 10, WHITE, "HandyVITA emulator by frangarcj");
+
     vita2d_start_drawing();
     vita2d_clear_screen();
-
-    font_draw_stringf(10, 10, WHITE, "HandyVITA emulator by frangarcj");
 
 		while(!newFrame&&!pause)
     {
@@ -171,15 +162,35 @@ int main()
     newFrame = false;
 
 
-		if (pause) {
-			font_draw_stringf(SCREEN_W/2 - 40, SCREEN_H - 50, WHITE, "PAUSE");
-		}
+
 
 		old_pad = pad;
 
 		vita2d_end_drawing();
+
+    /*if (pause) {
+      font_draw_stringf(SCREEN_W/2 - 40, SCREEN_H - 50, WHITE, "PAUSE");
+    }*/
+
 		vita2d_swap_buffers();
 	}
+
+  return 0;
+
+}
+
+PSP2_MODULE_INFO(0, 0, "handyvita")
+int main()
+{
+
+
+	vita2d_init();
+  char *path
+		= (char*)malloc(sizeof(char) * (strlen("cache0:/VitaDefilerClient/Documents/rom.lnx")));
+	sprintf(path, "cache0:/VitaDefilerClient/Documents/rom.lnx");
+
+  emulate(path);
+
 
 	//chip8_fini(&chip8);
 	vita2d_fini();
