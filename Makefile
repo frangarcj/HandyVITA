@@ -22,8 +22,8 @@ CFILES   := $(foreach dir,$(SOURCES), $(wildcard $(dir)/*.c))
 CXXFILES   := $(foreach dir,$(SOURCES), $(wildcard $(dir)/*.cpp))
 OBJS     := $(CFILES:.c=.o) $(BUILD_APP) $(CXXFILES:.cpp=.o)
 
-LIBS = -lSceDisplay_stub -lSceGxm_stub 	\
-	-lSceCtrl_stub -lSceTouch_stub
+LIBS = -lvita2d -lm -lSceDisplay_stub -lSceGxm_stub 	\
+	-lSceCtrl_stub
 
 DEFINES	=	-DPSP -DLSB_FIRST -DWANT_CRC32
 

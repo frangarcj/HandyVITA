@@ -17,6 +17,8 @@
 #include "../lynx/lynxdef.h"
 #include "utils.h"
 #include "draw.h"
+#include <vita2d.h>
+
 
 /*extern "C" void __cxa_pure_virtual()
 {
@@ -30,7 +32,9 @@ const SceSize sceUserMainThreadStackSize = 8*1024*1024;
 static uint8_t lynx_width = 160;
 static uint8_t lynx_height = 102;
 
-static uint32_t framebuffer[160*102];
+unsigned int *framebuffer;
+vita2d_texture *framebufferTex;
+
 
 static int scale;
 static int pos_x;
@@ -61,13 +65,17 @@ unsigned char* lynx_display_callback(ULONG objref)
     //printf("lynx_display_callback %d",initialized);
     if(!initialized)
     {
+        framebufferTex = vita2d_create_empty_texture(160, 102);
+        framebuffer = (unsigned int *)vita2d_texture_get_datap(framebufferTex);
+
+
         return (UBYTE*)framebuffer;
     }
 
 		//PINTAR FRAMEBUFFER
 
     //video_cb(framebuffer, lynx_width, lynx_height, 160*2);
-    blit_scale(framebuffer,pos_x,pos_y,lynx_width,lynx_height,scale);
+    vita2d_draw_texture_scale(framebufferTex, pos_x, pos_y, scale*1.0f, scale*1.0f);
 
     /*if(gAudioBufferPointer > 0)
     {
@@ -112,7 +120,9 @@ int main()
 	//struct chip8_context chip8;
 	int pause = 0;
 
-	init_video();
+	vita2d_init();
+
+
 	char *system_rom
     = (char*)malloc(sizeof(char) * (strlen("cache0:/VitaDefilerClient/Documents/") + 13));
   sprintf(system_rom, "%slynxboot.img", "cache0:/VitaDefilerClient/Documents/");
@@ -142,55 +152,16 @@ int main()
 	initialized = true;
 
 	while (1) {
-		clear_screen();
 
 		sceCtrlPeekBufferPositive(0, (SceCtrlData *)&pad, 1);
 
-		font_draw_stringf(10, 10, WHITE, "HandyVITA emulator by frangarcj");
-
     lynx->SetButtonData(get_lynx_input(pad));
 
-		/*unsigned int keys_down = pad.buttons & ~old_pad.buttons;
-		unsigned int keys_up = ~pad.buttons & old_pad.buttons;*/
-    /*
-		if (keys_down & PSP2_CTRL_UP) {
-			//chip8_key_press(&chip8, 1);
-		} else if (keys_up & PSP2_CTRL_UP) {
-			//chip8_key_release(&chip8, 1);
-		}
-		if (keys_down & PSP2_CTRL_DOWN) {
-			//chip8_key_press(&chip8, 4);
-		} else if (keys_up & PSP2_CTRL_DOWN) {
-			//chip8_key_release(&chip8, 4);
-		}
+    vita2d_start_drawing();
+    vita2d_clear_screen();
 
-		if (keys_down & PSP2_CTRL_TRIANGLE) {
-			//chip8_key_press(&chip8, 0xC);
-		} else if (keys_up & PSP2_CTRL_TRIANGLE) {
-			//chip8_key_release(&chip8, 0xC);
-		}
-		if (keys_down & PSP2_CTRL_CROSS) {
-			//chip8_key_press(&chip8, 0xD);
-		} else if (keys_up & PSP2_CTRL_CROSS) {
-			//chip8_key_release(&chip8, 0xD);
-		}*/
+    font_draw_stringf(10, 10, WHITE, "HandyVITA emulator by frangarcj");
 
-		/*if (pad.buttons & PSP2_CTRL_LTRIGGER) {
-			scale--;
-			if (scale < 1) scale = 1;
-			pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
-			pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
-		} else if (pad.buttons & PSP2_CTRL_RTRIGGER) {
-			scale++;
-			if ((lynx_width*scale) > SCREEN_W) scale--;
-			pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
-			pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
-		}
-
-		if (keys_down & PSP2_CTRL_START) {
-			pause = !pause;
-		}*/
-   //printf("starting frame");
 		while(!newFrame&&!pause)
     {
         lynx->Update();
@@ -205,11 +176,12 @@ int main()
 		}
 
 		old_pad = pad;
-		swap_buffers();
-		sceDisplayWaitVblankStart();
+
+		vita2d_end_drawing();
+		vita2d_swap_buffers();
 	}
 
 	//chip8_fini(&chip8);
-	end_video();
+	vita2d_fini();
 	return 0;
 }
