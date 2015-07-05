@@ -25,6 +25,8 @@
 #include "../lynx/lynxdef.h"
 #include "utils.h"
 #include "font.h"
+#include "audio.h"
+
 
 PSP2_MODULE_INFO(0, 0, "handyvita")
 
@@ -63,7 +65,7 @@ static map btn_map_no_rot[] = {
   { PSP2_CTRL_START, BUTTON_PAUSE },
 };
 
-void lynx_sound_stream_update(unsigned short *buffer, int buf_lenght){
+/*void lynx_sound_stream_update(unsigned short *buffer, int buf_lenght){
   uint16_t left;
   for(int i = 0; i < buf_lenght; i++){
     left=(snd_buffer8[i]<<8)-32768;
@@ -73,9 +75,9 @@ void lynx_sound_stream_update(unsigned short *buffer, int buf_lenght){
     ++buffer;
   }
   lynx->gAudioBufferPointer=0;
-}
+}*/
 
-static int sound_thread(SceSize args, void *argp){
+/*static int sound_thread(SceSize args, void *argp){
 
   printf("Audiothread running");
   CSystem *lynx_aux = *(CSystem**)argp;
@@ -86,6 +88,34 @@ static int sound_thread(SceSize args, void *argp){
 
         lynx_sound_stream_update(soundBuffer,lynx_aux->gAudioBufferPointer);
         sceAudioOutOutput(audioOutPort,(const void*)soundBuffer);
+    }
+  }
+}*/
+
+void AudioCallback(void *buffer, unsigned int *length, void *userdata)
+{
+  PspMonoSample *OutBuf = (PspMonoSample*)buffer;
+  int i;
+  int len = *length >> 1;
+
+  if(((int)lynx->gAudioBufferPointer >= len)
+    && (lynx->gAudioBufferPointer != 0) && (!lynx->gSystemHalt) )
+  {
+    for (i = 0; i < len; i++)
+    {
+      short sample = (short)(((int)lynx->gAudioBuffer[i] << 8) - 32768);
+      (OutBuf++)->Channel = sample;
+      (OutBuf++)->Channel = sample;
+    }
+    lynx->gAudioBufferPointer = 0;
+  }
+  else
+  {
+    *length = 64;
+    for (i = 0; i < (int)*length; i+=2)
+    {
+      (OutBuf++)->Channel = 0;
+      (OutBuf++)->Channel = 0;
     }
   }
 }
@@ -99,11 +129,13 @@ unsigned char* lynx_display_callback(ULONG objref)
         framebuffer = (unsigned int *)vita2d_texture_get_datap(framebufferTex);
         snd_buffer8 = (unsigned char *) &(lynx->gAudioBuffer);
         lynx->gAudioEnabled = true;
-        audioOutPort=sceAudioOutOpenPort(PSP2_AUDIO_OUT_PORT_TYPE_MAIN,4096,48000,PSP2_AUDIO_OUT_MODE_STEREO);
+        /*audioOutPort=sceAudioOutOpenPort(PSP2_AUDIO_OUT_PORT_TYPE_MAIN,4096,48000,PSP2_AUDIO_OUT_MODE_STEREO);
         printf("%x",audioOutPort);
         SceUID sound_thid = sceKernelCreateThread("Sound thread",sound_thread,0x10000100,0x10000,0,0,NULL);
         printf("%x",sound_thid);
-        sceKernelStartThread(sound_thid,sizeof(*lynx),lynx);
+        sceKernelStartThread(sound_thid,sizeof(*lynx),lynx);*/
+        pspAudioSetChannelCallback(0, AudioCallback, 0);
+
         return (UBYTE*)framebuffer;
     }
 
@@ -275,6 +307,9 @@ int main()
 	// Initialize Screen Output
   vita2d_init();
 
+  pspAudioInit(2048, 0);
+
+
 	// Update List
 	updateList(CLEAR);
 
@@ -368,7 +403,7 @@ int main()
 		sceKernelDelayThread(10000);
 	}
 
-	//chip8_fini(&chip8);
+  pspAudioShutdown();
 	vita2d_fini();
 
 	return 0;
