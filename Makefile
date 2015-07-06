@@ -53,4 +53,4 @@ clean:
 	@rm -rf $(TARGET).elf $(TARGET).velf $(OBJS) $(DATA)/*.h
 
 copy: $(TARGET).velf
-	@cp $(TARGET).velf ~/shared/$(TARGET).elf
+	@cp $(TARGET).velf ~/PSPSTUFF/compartido/$(TARGET).elf
