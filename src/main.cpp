@@ -47,6 +47,8 @@ static int pos_y;
 
 bool newFrame = false;
 static bool initialized = false;
+static bool endEmulation = false;
+
 
 
 static CSystem *lynx = NULL;
@@ -169,6 +171,8 @@ unsigned get_lynx_input(SceCtrlData pad, SceCtrlData old_pad)
 			if (scale > 5) scale = 5;
 			pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
 			pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
+		} else if (keys_down & PSP2_CTRL_SELECT) {
+			endEmulation=true;
 		}
 
     return res;
@@ -184,7 +188,7 @@ int emulate(char *path){
  //printf("Loading lynx.... %s",path);
 
   lynx = new CSystem(path, system_rom);
-
+  pspAudioInit(2048, 0);
  //printf("Lynx loaded: %p",lynx);
   int pause = 0;
 
@@ -203,7 +207,7 @@ int emulate(char *path){
 	pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
 	initialized = true;
 
-	while (1) {
+	while (!endEmulation) {
 
 		sceCtrlPeekBufferPositive(0, (SceCtrlData *)&pad, 1);
 
@@ -215,7 +219,7 @@ int emulate(char *path){
     font_draw_stringf(10, 5, WHITE, "HandyVITA emulator by frangarcj");
 
 
-		while(!newFrame&&!pause)
+		while(!newFrame&&!pause&&!endEmulation)
     {
         lynx->Update();
     }
@@ -235,7 +239,11 @@ int emulate(char *path){
     vita2d_end_drawing();
 		vita2d_swap_buffers();
 	}
-
+  initialized = false;
+  endEmulation = false;
+  lynx->gSystemHalt=true;
+  pspAudioShutdown();
+  delete lynx;
   return 0;
 
 }
@@ -307,7 +315,6 @@ int main()
 	// Initialize Screen Output
   vita2d_init();
 
-  pspAudioInit(2048, 0);
 
 
 	// Update List
@@ -355,6 +362,8 @@ int main()
       	sprintf(path, "cache0:/VitaDefilerClient/Documents/rom.lnx");*/
 
         emulate(path);
+
+        paintList(KEEP);
 			}
       // Position Decrement
 			else if(PRESSED(lastbuttons, data.buttons, PSP2_CTRL_UP))
@@ -403,7 +412,6 @@ int main()
 		sceKernelDelayThread(10000);
 	}
 
-  pspAudioShutdown();
 	vita2d_fini();
 
 	return 0;
