@@ -5,15 +5,22 @@ The first Atari Linx emulator for the PSVita
 
 Based on Libretro Handy core (https://github.com/libretro/libretro-handy)
 
-Download Version 1.2
+Download Version 1.3
 --------------------
+https://www.dropbox.com/s/vwyx21cde6b6gla/HANDY.1.3.velf?dl=0
+
+### Download Version 1.2
 https://www.dropbox.com/s/0jqxj1ysaja66ce/HANDY.1.2.velf?dl=0
 
-Download Version 1.1
---------------------
+### Download Version 1.1
 https://www.dropbox.com/s/tk4cv6h70vyg1v3/HANDY.1.1.velf?dl=0
 
-### Release Notes
+Release Notes
+-------------
+
+1.3
+
+Sound!! Please compare with original hardware. I think it's slower.
 
 1.2
 
