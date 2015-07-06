@@ -139,8 +139,8 @@ int pspAudioInit(int sample_count, int stereo)
   {
     label[6] = '0' + i;
     AudioStatus[i].ThreadHandle =
-      sceKernelCreateThread(label, (void*)&AudioChannelThread, 0x12, 0x10000,
-        0, 0,NULL);
+      sceKernelCreateThread(label, (void*)&AudioChannelThread, 0x10000100, 0x10000,
+        0, 0, NULL);
 
     if (AudioStatus[i].ThreadHandle < 0)
     {
