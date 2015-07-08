@@ -900,6 +900,7 @@ void CMikie::DisplaySetAttributes(ULONG Rotate,ULONG Format,ULONG Pitch,UBYTE* (
 				mColourMap[Spot.Index]=(Spot.Colours.Blue<<20)&0x00ff0000;
 				mColourMap[Spot.Index]|=(Spot.Colours.Green<<12)&0x0000ff00;
 				mColourMap[Spot.Index]|=(Spot.Colours.Red<<4)&0x000000ff;
+				mColourMap[Spot.Index]|=0xff000000;
 			}
 			break;
 		default:

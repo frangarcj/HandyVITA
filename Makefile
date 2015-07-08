@@ -25,7 +25,7 @@ OBJS     := $(CFILES:.c=.o) $(BUILD_APP) $(CXXFILES:.cpp=.o)
 LIBS = -lvita2d -lm -lSceDisplay_stub -lSceGxm_stub 	\
 	-lSceCtrl_stub -lSceAudio_stub
 
-DEFINES	=	-DPSP -DLSB_FIRST -DWANT_CRC32 -DLINUX_PATCH
+DEFINES	=	-DPSP -DLSB_FIRST -DWANT_CRC32
 
 
 
@@ -35,7 +35,7 @@ CC      = $(PREFIX)-gcc
 CXX			=$(PREFIX)-g++
 READELF = $(PREFIX)-readelf
 OBJDUMP = $(PREFIX)-objdump
-CFLAGS  = -Wall -specs=psp2.specs -I$(DATA)  $(DEFINES)
+CFLAGS  = -Wall -specs=psp2.specs $(DEFINES)
 CXXFLAGS = $(CFLAGS) -O2 -fno-unwind-tables -fno-rtti -fno-exceptions -Wno-deprecated -Wno-comment -Wno-sequence-point -std=c++11
 ASFLAGS = $(CFLAGS)
 

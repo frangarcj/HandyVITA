@@ -142,7 +142,7 @@ unsigned char* lynx_display_callback(ULONG objref)
     }
 
     //video_cb(framebuffer, lynx_width, lynx_height, 160*2);
-    vita2d_draw_texture_scale(framebufferTex, pos_x, pos_y, scale*1.0f, scale*1.0f);
+    vita2d_draw_texture_lcd3x(framebufferTex, pos_x, pos_y, scale*1.0f, scale*1.0f);
 
 
 
@@ -188,7 +188,7 @@ int emulate(char *path){
  //printf("Loading lynx.... %s",path);
 
   lynx = new CSystem(path, system_rom);
-  pspAudioInit(2048, 0);
+  pspAudioInit(4096, 0);
  //printf("Lynx loaded: %p",lynx);
   int pause = 0;
 
@@ -202,7 +202,7 @@ int emulate(char *path){
 	//chip8_init(&chip8, 64, 32);
 	//chip8_loadrom_memory(&chip8, PONG2_bin, PONG2_bin_size);
 
-	scale = 4;
+	scale = 5;
 	pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
 	pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
 	initialized = true;
@@ -216,7 +216,6 @@ int emulate(char *path){
     vita2d_start_drawing();
     vita2d_clear_screen();
 
-    font_draw_stringf(10, 5, WHITE, "HandyVITA emulator by frangarcj");
 
 
 		while(!newFrame&&!pause&&!endEmulation)
@@ -232,12 +231,9 @@ int emulate(char *path){
 
 		old_pad = pad;
 
-    if (pause) {
-      font_draw_stringf(SCREEN_W/2 - 40, SCREEN_H - 50, WHITE, "PAUSE");
-    }
-
     vita2d_end_drawing();
 		vita2d_swap_buffers();
+
 	}
   initialized = false;
   endEmulation = false;
@@ -264,9 +260,9 @@ static char cwd[1024];
 // GUI Definitions
 #define FONT_SIZE 7
 #define PADDING 3
-#define FONT_COLOR 0xFFFFFF
-#define FONT_SELECT_COLOR 0xFFD800
-#define BACK_COLOR 0xBCAD94
+#define FONT_COLOR 0xFFFFFFFF
+#define FONT_SELECT_COLOR 0xFFFFD800
+#define BACK_COLOR 0xFFBCAD94
 #define CENTER_X(s) (240 - ((strlen(s) * FONT_SIZE) >> 1))
 #define RIGHT_X(s) (480 - (strlen(s) * FONT_SIZE))
 #define CENTER_Y 132
@@ -314,6 +310,7 @@ int main()
 
 	// Initialize Screen Output
   vita2d_init();
+  vita2d_init_lcd3x();
 
 
 
@@ -545,7 +542,9 @@ void paintList(int withclear)
 	/*char * strrunlevel = getModeStr(mode);
 	printoob(strrunlevel, RIGHT_X(strrunlevel) - 10, 10, FONT_COLOR);
   */
-	// Paint Controls
+  printoob("HandyVITA emulator by frangarcj", 10, 242, FONT_SELECT_COLOR);
+
+  // Paint Controls
 	printoob("[ UP & DOWN ]    File Selection", 10, 252, FONT_COLOR);
 	printoob("[ LEFT & RIGHT ] Mode Selection", 10, 262, FONT_COLOR);
 	printoob("[ START ]  RUN", 330, 252, FONT_COLOR);
