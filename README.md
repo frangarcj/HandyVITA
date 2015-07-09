@@ -5,30 +5,16 @@ The first Atari Linx emulator for the PSVita
 
 Based on Libretro Handy core (https://github.com/libretro/libretro-handy)
 
-Download Version 1.3
---------------------
-https://www.dropbox.com/s/vwyx21cde6b6gla/HANDY.1.3.velf?dl=0
+Changelog
+---------
+Lcd3x shader by default
 
-### Download Version 1.2
-https://www.dropbox.com/s/0jqxj1ysaja66ce/HANDY.1.2.velf?dl=0
+SELECT exists to rom menu
 
-### Download Version 1.1
-https://www.dropbox.com/s/tk4cv6h70vyg1v3/HANDY.1.1.velf?dl=0
 
-Release Notes
--------------
-
-1.3
-
-Sound!! Please compare with original hardware. I think it's slower.
-
-1.2
-
-Menu for rom selection based on psp2shell
-
-1.1
-
-GPU scaling thanks to xerpi with vita2dlib https://github.com/xerpi/vita2dlib
+Download and Releases
+---------------------
+https://github.com/frangarcj/HandyVITA/releases
 
 Instructions
 -------------
@@ -58,6 +44,8 @@ L ---> Option 1
 R ---> Option 2
 
 Start ---> Pause
+
+Select ---> Return to Menu
 
 
 
