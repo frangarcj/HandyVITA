@@ -30,7 +30,7 @@ typedef struct
   short Channel;
 } PspMonoSample;
 
-typedef void (*pspAudioCallback)(void *buffer, unsigned int *sample_count, void *userdata);
+typedef int (*pspAudioCallback)(void *buffer, unsigned int *sample_count, void *userdata);
 
 int  pspAudioInit(int sample_count, int stereo);
 void pspAudioSetVolume(int channel, int left, int right);

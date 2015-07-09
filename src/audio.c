@@ -224,6 +224,7 @@ static int AudioChannelThread(int args, void *argp)
   volatile int bufidx = 0;
   int channel = *(int*)argp;
   int i;
+  int readedLength;
   unsigned short *ptr_m;
   unsigned int *ptr_s;
   void *bufptr;
@@ -240,17 +241,18 @@ static int AudioChannelThread(int args, void *argp)
     bufptr = AudioBuffer[channel][bufidx];
     samples = AudioBufferSamples[channel][bufidx];
 
-    if (callback) callback(bufptr, &samples, AudioStatus[channel].Userdata);
+    if (callback) readedLength=callback(bufptr, &samples, AudioStatus[channel].Userdata);
     else
     {
       if (Stereo) for (i = 0, ptr_s = bufptr; i < samples; i++) *(ptr_s++) = 0;
       else for (i = 0, ptr_m = bufptr; i < samples; i++) *(ptr_m++) = 0;
     }
+    if(readedLength>0){
+	    OutputBlocking(channel, AudioStatus[channel].LeftVolume,
+         AudioStatus[channel].RightVolume, bufptr, samples);
 
-	  OutputBlocking(channel, AudioStatus[channel].LeftVolume,
-      AudioStatus[channel].RightVolume, bufptr, samples);
-
-    bufidx = (bufidx ? 0 : 1);
+      bufidx = (bufidx ? 0 : 1);
+    }
   }
 
   sceKernelExitThread(0);

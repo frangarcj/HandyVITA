@@ -94,7 +94,7 @@ static map btn_map_no_rot[] = {
   }
 }*/
 
-void AudioCallback(void *buffer, unsigned int *length, void *userdata)
+int AudioCallback(void *buffer, unsigned int *length, void *userdata)
 {
   PspMonoSample *OutBuf = (PspMonoSample*)buffer;
   int i;
@@ -110,15 +110,11 @@ void AudioCallback(void *buffer, unsigned int *length, void *userdata)
       (OutBuf++)->Channel = sample;
     }
     lynx->gAudioBufferPointer = 0;
+    return *length;
   }
   else
   {
-    *length = 64;
-    for (i = 0; i < (int)*length; i+=2)
-    {
-      (OutBuf++)->Channel = 0;
-      (OutBuf++)->Channel = 0;
-    }
+    return 0;
   }
 }
 
