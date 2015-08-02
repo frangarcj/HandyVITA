@@ -22,7 +22,7 @@ CFILES   := $(foreach dir,$(SOURCES), $(wildcard $(dir)/*.c))
 CXXFILES   := $(foreach dir,$(SOURCES), $(wildcard $(dir)/*.cpp))
 OBJS     := $(CFILES:.c=.o) $(BUILD_APP) $(CXXFILES:.cpp=.o)
 
-LIBS = -lvita2d -lm -lSceDisplay_stub -lSceGxm_stub 	\
+LIBS = -lvita2d -lSceDisplay_stub -lSceGxm_stub 	\
 	-lSceCtrl_stub -lSceAudio_stub
 
 DEFINES	=	-DPSP -DLSB_FIRST -DWANT_CRC32 -DLINUX_PATCH
@@ -35,8 +35,10 @@ CC      = $(PREFIX)-gcc
 CXX			=$(PREFIX)-g++
 READELF = $(PREFIX)-readelf
 OBJDUMP = $(PREFIX)-objdump
-CFLAGS  = -Wall -specs=psp2.specs $(DEFINES)
-CXXFLAGS = $(CFLAGS) -O2 -fno-unwind-tables -fno-rtti -fno-exceptions -Wno-deprecated -Wno-comment -Wno-sequence-point -std=c++11
+CFLAGS  = -Wall -specs=psp2.specs $(DEFINES) -fno-exceptions \
+					-fno-unwind-tables -fno-asynchronous-unwind-tables -O3 -ftree-vectorize \
+					-mfloat-abi=hard -ffast-math -fsingle-precision-constant -ftree-vectorizer-verbose=2 -fopt-info-vec-optimized -funroll-loops
+CXXFLAGS = $(CFLAGS) -fno-rtti -Wno-deprecated -Wno-comment -Wno-sequence-point -std=c++11
 ASFLAGS = $(CFLAGS)
 
 

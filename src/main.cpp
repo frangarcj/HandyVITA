@@ -15,9 +15,8 @@
 #include <psp2/io/fcntl.h>
 #include <psp2/io/dirent.h>
 #include <psp2/audioout.h>
-#include <psp2/kernel/processmgr.h>
 #include <psp2/kernel/threadmgr.h>
-#include <psp2/kernel/memorymgr.h>
+
 
 #include <vita2d.h>
 
@@ -44,6 +43,8 @@ static unsigned char *snd_buffer8;
 static int scale;
 static int pos_x;
 static int pos_y;
+
+int clearScreen = 2;
 
 bool newFrame = false;
 static bool initialized = false;
@@ -162,11 +163,13 @@ unsigned get_lynx_input(SceCtrlData pad, SceCtrlData old_pad)
 			if (scale < 1) scale = 1;
 			pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
 			pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
+      clearScreen = 2;
 		} else if (keys_down & PSP2_CTRL_TRIANGLE) {
 			scale++;
 			if (scale > 5) scale = 5;
 			pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
 			pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
+      clearScreen = 2;
 		} else if (keys_down & PSP2_CTRL_SELECT) {
 			endEmulation=true;
 		}
@@ -202,7 +205,7 @@ int emulate(char *path){
 	pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
 	pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
 	initialized = true;
-
+  clearScreen = 2;
 	while (!endEmulation) {
 
 		sceCtrlPeekBufferPositive(0, (SceCtrlData *)&pad, 1);
@@ -210,8 +213,10 @@ int emulate(char *path){
     lynx->SetButtonData(get_lynx_input(pad,old_pad));
 
     vita2d_start_drawing();
-    vita2d_clear_screen();
-
+    if(clearScreen>0){
+      vita2d_clear_screen();
+      clearScreen--;
+    }
 
 
 		while(!newFrame&&!pause&&!endEmulation)
@@ -299,7 +304,7 @@ void recursiveFree(File * node);
 
 
 
-int main()
+int main(int argc, char **argv)
 {
   // Set Start Path
 	strcpy(cwd, START_PATH);
