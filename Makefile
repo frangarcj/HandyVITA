@@ -9,7 +9,7 @@ ZLIB := $(HANDY)/zlib-113
 #SOURCES		:= src $(ZLIB)
 SOURCES		:= src
 
-INCLUDES	:= src
+INCLUDES	:= -Isrc
 
 
 #BUILD_ZLIB=$(ZLIB)/unzip.o
@@ -22,20 +22,20 @@ CFILES   := $(foreach dir,$(SOURCES), $(wildcard $(dir)/*.c))
 CXXFILES   := $(foreach dir,$(SOURCES), $(wildcard $(dir)/*.cpp))
 OBJS     := $(CFILES:.c=.o) $(BUILD_APP) $(CXXFILES:.cpp=.o)
 
-LIBS = -lvita2d -lSceDisplay_stub -lSceGxm_stub 	\
+LIBS= -lvita2d -lm -lstdc++ -lSceSysmodule_stub -lSceCommonDialog_stub -lSceDisplay_stub -lSceGxm_stub -lScePower_stub 	\
 	-lSceCtrl_stub -lSceAudio_stub
 
 DEFINES	=	-DPSP -DLSB_FIRST -DWANT_CRC32 -DLINUX_PATCH
 
 
 
-PREFIX  = arm-none-eabi
+PREFIX  = arm-vita-eabi
 AS	= $(PREFIX)-as
 CC      = $(PREFIX)-gcc
 CXX			=$(PREFIX)-g++
 READELF = $(PREFIX)-readelf
 OBJDUMP = $(PREFIX)-objdump
-CFLAGS  = -Wall -specs=psp2.specs $(DEFINES) -fno-exceptions \
+CFLAGS  = -Wl,-q -O3 $(INCLUDES) $(DEFINES) -fno-exceptions \
 					-fno-unwind-tables -fno-asynchronous-unwind-tables -O3 -ftree-vectorize \
 					-mfloat-abi=hard -ffast-math -fsingle-precision-constant -ftree-vectorizer-verbose=2 -fopt-info-vec-optimized -funroll-loops
 CXXFLAGS = $(CFLAGS) -fno-rtti -Wno-deprecated -Wno-comment -Wno-sequence-point -std=c++11
@@ -43,10 +43,14 @@ ASFLAGS = $(CFLAGS)
 
 
 
-all: $(TARGET).velf
+all: eboot.bin
 
+eboot.bin: $(TARGET).velf
+	vita-make-fself $(TARGET).velf $@
+	vita-mksfoex -s TITLE_ID=FRAN00002 "HandyVITA" param.sfo
 $(TARGET).velf: $(TARGET).elf
-	psp2-fixup -q -S $< $@
+	$(PREFIX)-strip -g $<
+	vita-elf-create $< $@ > /dev/null
 
 $(TARGET).elf: $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
@@ -54,5 +58,6 @@ $(TARGET).elf: $(OBJS)
 clean:
 	@rm -rf $(TARGET).elf $(TARGET).velf $(OBJS) $(DATA)/*.h
 
-copy: $(TARGET).velf
-	@cp $(TARGET).velf ~/PSPSTUFF/compartido/$(TARGET).elf
+copy: eboot.bin
+	@cp eboot.bin param.sfo /mnt/shared/HandyVITA
+

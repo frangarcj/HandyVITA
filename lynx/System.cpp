@@ -161,7 +161,7 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 		SceUID fp;
 
 		// Open the cartridge file for reading
-		if((fp=sceIoOpen(gamefile,PSP2_O_RDONLY,0777))<=0)
+		if((fp=sceIoOpen(gamefile,SCE_O_RDONLY,0777))<=0)
 		{
 			printf( "Invalid Cart.\n");
 		}
@@ -171,8 +171,8 @@ CSystem::CSystem(const char* gamefile, const char* romfile)
 		}
 
 		// How big is the file ??
-		filesize=sceIoLseek(fp,0,PSP2_SEEK_END);
-		sceIoLseek(fp,0,PSP2_SEEK_SET);
+		filesize=sceIoLseek(fp,0,SCE_SEEK_END);
+		sceIoLseek(fp,0,SCE_SEEK_SET);
 		filememory=(UBYTE*) new UBYTE[filesize];
 
 		if(sceIoRead(fp,filememory,filesize)!=filesize)

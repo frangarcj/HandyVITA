@@ -16,6 +16,7 @@
 #include <psp2/io/dirent.h>
 #include <psp2/audioout.h>
 #include <psp2/kernel/threadmgr.h>
+#include <psp2/power.h>
 
 
 #include <vita2d.h>
@@ -44,11 +45,15 @@ static int scale;
 static int pos_x;
 static int pos_y;
 
-int clearScreen = 2;
+int clearScreen = 3;
 
 bool newFrame = false;
 static bool initialized = false;
 static bool endEmulation = false;
+
+int __exidx_end = 0;
+int __exidx_start = 0;
+
 
 
 
@@ -57,15 +62,15 @@ static CSystem *lynx = NULL;
 struct map { unsigned psp2; unsigned lynx; };
 
 static map btn_map_no_rot[] = {
-  { PSP2_CTRL_CIRCLE, BUTTON_A },
-  { PSP2_CTRL_CROSS, BUTTON_B },
-  { PSP2_CTRL_RIGHT, BUTTON_RIGHT },
-  { PSP2_CTRL_LEFT, BUTTON_LEFT },
-  { PSP2_CTRL_UP, BUTTON_UP },
-  { PSP2_CTRL_DOWN, BUTTON_DOWN },
-  { PSP2_CTRL_LTRIGGER, BUTTON_OPT1 },
-  { PSP2_CTRL_RTRIGGER, BUTTON_OPT2 },
-  { PSP2_CTRL_START, BUTTON_PAUSE },
+  { SCE_CTRL_CIRCLE, BUTTON_A },
+  { SCE_CTRL_CROSS, BUTTON_B },
+  { SCE_CTRL_RIGHT, BUTTON_RIGHT },
+  { SCE_CTRL_LEFT, BUTTON_LEFT },
+  { SCE_CTRL_UP, BUTTON_UP },
+  { SCE_CTRL_DOWN, BUTTON_DOWN },
+  { SCE_CTRL_LTRIGGER, BUTTON_OPT1 },
+  { SCE_CTRL_RTRIGGER, BUTTON_OPT2 },
+  { SCE_CTRL_START, BUTTON_PAUSE },
 };
 
 /*void lynx_sound_stream_update(unsigned short *buffer, int buf_lenght){
@@ -128,7 +133,7 @@ unsigned char* lynx_display_callback(ULONG objref)
         framebuffer = (unsigned int *)vita2d_texture_get_datap(framebufferTex);
         snd_buffer8 = (unsigned char *) &(lynx->gAudioBuffer);
         lynx->gAudioEnabled = true;
-        /*audioOutPort=sceAudioOutOpenPort(PSP2_AUDIO_OUT_PORT_TYPE_MAIN,4096,48000,PSP2_AUDIO_OUT_MODE_STEREO);
+        /*audioOutPort=sceAudioOutOpenPort(SCE_AUDIO_OUT_PORT_TYPE_MAIN,4096,48000,SCE_AUDIO_OUT_MODE_STEREO);
         printf("%x",audioOutPort);
         SceUID sound_thid = sceKernelCreateThread("Sound thread",sound_thread,0x10000100,0x10000,0,0,NULL);
         printf("%x",sound_thid);
@@ -139,7 +144,7 @@ unsigned char* lynx_display_callback(ULONG objref)
     }
 
     //video_cb(framebuffer, lynx_width, lynx_height, 160*2);
-    vita2d_draw_texture_lcd3x(framebufferTex, pos_x, pos_y, scale*1.0f, scale*1.0f);
+    vita2d_draw_texture_scale(framebufferTex, pos_x, pos_y, scale*1.0f, scale*1.0f);
 
 
 
@@ -158,19 +163,19 @@ unsigned get_lynx_input(SceCtrlData pad, SceCtrlData old_pad)
         res |= pad.buttons & btn_map_no_rot[i].psp2 ? btn_map_no_rot[i].lynx : 0;
     }
 
-    if (keys_down & PSP2_CTRL_SQUARE) {
+    if (keys_down & SCE_CTRL_SQUARE) {
 			scale--;
 			if (scale < 1) scale = 1;
 			pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
 			pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
-      clearScreen = 2;
-		} else if (keys_down & PSP2_CTRL_TRIANGLE) {
+      clearScreen = 3;
+		} else if (keys_down & SCE_CTRL_TRIANGLE) {
 			scale++;
 			if (scale > 5) scale = 5;
 			pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
 			pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
-      clearScreen = 2;
-		} else if (keys_down & PSP2_CTRL_SELECT) {
+      clearScreen = 3;
+		} else if (keys_down & SCE_CTRL_SELECT) {
 			endEmulation=true;
 		}
 
@@ -179,10 +184,10 @@ unsigned get_lynx_input(SceCtrlData pad, SceCtrlData old_pad)
 
 int emulate(char *path){
   char *system_rom
-    = (char*)malloc(sizeof(char) * (strlen("cache0:/VitaDefilerClient/Documents/") + 13));
-  sprintf(system_rom, "%slynxboot.img", "cache0:/VitaDefilerClient/Documents/");
+    = (char*)malloc(sizeof(char) * (strlen("ux0:/data/HandyVITA") + 13));
+  sprintf(system_rom, "%slynxboot.img", "ux0:/data/HandyVITA");
 
-
+    scePowerSetArmClockFrequency(444);
 
  //printf("Loading lynx.... %s",path);
 
@@ -205,7 +210,7 @@ int emulate(char *path){
 	pos_x = SCREEN_W/2 - (lynx_width/2)*scale;
 	pos_y = SCREEN_H/2 - (lynx_height/2)*scale;
 	initialized = true;
-  clearScreen = 2;
+  clearScreen = 3;
 	while (!endEmulation) {
 
 		sceCtrlPeekBufferPositive(0, (SceCtrlData *)&pad, 1);
@@ -247,8 +252,8 @@ int emulate(char *path){
 
 
 
-#define ROOT_PATH "cache0:/"
-#define START_PATH "cache0:/VitaDefilerClient/Documents/"
+#define ROOT_PATH "ux0:/"
+#define START_PATH "ux0:/"
 // Default Start Path
 
 // Current Path
@@ -311,7 +316,6 @@ int main(int argc, char **argv)
 
 	// Initialize Screen Output
   vita2d_init();
-  vita2d_init_lcd3x();
 
 
 
@@ -341,7 +345,7 @@ int main(int argc, char **argv)
 		if(filecount > 0)
 		{
 			// Start File
-			if(PRESSED(lastbuttons, data.buttons, PSP2_CTRL_START))
+			if(PRESSED(lastbuttons, data.buttons, SCE_CTRL_START))
 			{
 				// Start File
         File * file = findindex(position);
@@ -364,7 +368,7 @@ int main(int argc, char **argv)
         paintList(KEEP);
 			}
       // Position Decrement
-			else if(PRESSED(lastbuttons, data.buttons, PSP2_CTRL_UP))
+			else if(PRESSED(lastbuttons, data.buttons, SCE_CTRL_UP))
 			{
 				// Decrease Position
 				if(position > 0) position--;
@@ -377,7 +381,7 @@ int main(int argc, char **argv)
 			}
 
 			// Position Increment
-			else if(PRESSED(lastbuttons, data.buttons, PSP2_CTRL_DOWN))
+			else if(PRESSED(lastbuttons, data.buttons, SCE_CTRL_DOWN))
 			{
 				// Increase Position
 				if(position < (filecount - 1)) position++;
@@ -389,7 +393,7 @@ int main(int argc, char **argv)
 				paintList(KEEP);
 			}
       // Navigate to Folder
-			else if(PRESSED(lastbuttons, data.buttons, PSP2_CTRL_CROSS))
+			else if(PRESSED(lastbuttons, data.buttons, SCE_CTRL_CROSS))
 			{
 				// Attempt to navigate to Target
 				if(navigate() == 0)
@@ -490,7 +494,7 @@ void updateList(int clearindex)
 				strcpy(item->name, info.d_name);
 
 				// Set Folder Flag
-				item->isFolder = PSP2_S_ISDIR(info.d_stat.st_mode);
+				item->isFolder = SCE_S_ISDIR(info.d_stat.st_mode);
 
 				// New List
 				if(files == NULL) files = item;
@@ -547,7 +551,7 @@ void paintList(int withclear)
 
   // Paint Controls
 	printoob("[ UP & DOWN ]    File Selection", 10, 252, FONT_COLOR);
-	printoob("[ LEFT & RIGHT ] Mode Selection", 10, 262, FONT_COLOR);
+	//printoob("[ LEFT & RIGHT ] Mode Selection", 10, 262, FONT_COLOR);
 	printoob("[ START ]  RUN", 330, 252, FONT_COLOR);
 	printoob("[ CROSS ] Navigate", 330, 262, FONT_COLOR);
 

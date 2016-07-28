@@ -21,6 +21,8 @@ extern "C" {
 #define BLACK RGBA8(0,0,0,255)
 #define WHITE RGBA8(255,255,255,255)
 
+int scePowerSetArmClockFrequency(int freq);
+
 #ifdef __cplusplus
 }
 #endif
