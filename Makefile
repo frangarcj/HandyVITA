@@ -58,7 +58,8 @@ $(TARGET).elf: $(OBJS)
 
 package:
 	@mkdir -p sce_sys
-	@cp param.sfo sce_sys
+	@cp param.sfo icon0.png pic0.png sce_sys
+	@cp -r livearea sce_sys
 	@zip -r $(VPK_NAME).vpk eboot.bin sce_sys
 
 clean:
