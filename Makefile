@@ -6,6 +6,7 @@
 TARGET		:= HANDY
 HANDY := lynx
 ZLIB := $(HANDY)/zlib-113
+VPK_NAME	:= HandyVITA
 #SOURCES		:= src $(ZLIB)
 SOURCES		:= src
 
@@ -43,11 +44,11 @@ ASFLAGS = $(CFLAGS)
 
 
 
-all: eboot.bin
+all: eboot.bin package
 
 eboot.bin: $(TARGET).velf
 	vita-make-fself $(TARGET).velf $@
-	vita-mksfoex -s TITLE_ID=FRAN00002 "HandyVITA" param.sfo
+	vita-mksfoex -s TITLE_ID=FRAN00002 "$(VPK_NAME)" param.sfo
 $(TARGET).velf: $(TARGET).elf
 	$(PREFIX)-strip -g $<
 	vita-elf-create $< $@ > /dev/null
@@ -55,9 +56,13 @@ $(TARGET).velf: $(TARGET).elf
 $(TARGET).elf: $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
+package:
+	@mkdir -p sce_sys
+	@cp param.sfo icon0.png pic0.png sce_sys
+	@cp -r livearea sce_sys
+	@zip -r $(VPK_NAME).vpk eboot.bin sce_sys
+
 clean:
 	@rm -rf $(TARGET).elf $(TARGET).velf $(OBJS) $(DATA)/*.h
-
-copy: eboot.bin
-	@cp eboot.bin param.sfo /mnt/shared/HandyVITA
+	@rm -rf eboot.bin param.sfo sce_sys $(VPK_NAME).vpk
 
