@@ -11,7 +11,6 @@
 #include <psp2/display.h>
 #include <psp2/gxm.h>
 #include <psp2/types.h>
-#include <psp2/moduleinfo.h>
 #include <psp2/io/fcntl.h>
 #include <psp2/io/dirent.h>
 #include <psp2/audioout.h>
@@ -27,10 +26,6 @@
 #include "font.h"
 #include "audio.h"
 
-
-PSP2_MODULE_INFO(0, 0, "handyvita")
-
-const SceSize sceUserMainThreadStackSize = 8*1024*1024;
 
 static uint8_t lynx_width = 160;
 static uint8_t lynx_height = 102;
@@ -338,7 +333,7 @@ int main(int argc, char **argv)
 		memset(&data, 0, sizeof(data));
 
 		// Read Button Data
-		sceCtrlSetSamplingMode(1);
+		sceCtrlSetSamplingMode(SCE_CTRL_MODE_ANALOG);
 		sceCtrlPeekBufferPositive(0, &data, 1);
 
 		// Other Commands
